@@ -1,5 +1,5 @@
 import express from "express";
-import * as utils from "./utils";
+import * as utils from "./utils.js";
 
 const router = express.Router();
 
