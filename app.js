@@ -10,6 +10,16 @@ mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/cobex');
 
 const app = express();
 
+//api documentation
+import swaggerUi from 'swagger-ui-express';
+import fs from 'fs';
+
+
+// Parse the OpenAPI document.
+const openApiDocument = JSON.parse(fs.readFileSync('./openapi.json'));
+// Serve the Swagger UI documentation.
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument));
+
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
