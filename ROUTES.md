@@ -1,40 +1,66 @@
 # CRUD
 ## Utilisateurs
 Créer utilisateur
-Update son mdp et son nom
-Delete supprimer son compte -> mais que se passe-t-il avec leurs scores ? anonymiser son score
-Read son compte OU slm nom (afficher les high score)
+Read ->son compte OU slm nom (afficher les high score)
+Update -> son mdp et son nom
+Delete ->supprimer son compte -> mais que se passe-t-il avec leurs scores ? anonymiser son score
 
 ## Parcours 
-Créer ? slm admin ou pas du tout
-Modifier ? slm admin ou pas du tout
-Delete ? slm admin ou pas du tout
-Read tout le monde pour afficher sur liste
+Créer ->slm admin ou pas du tout
+Read ->tout le monde pour afficher sur liste
+Update ->slm admin ou pas du tout => choix : un admin peut modifier que les parcours qu'il a créer ET Superadmin peut tout modifier
+Delete ->slm admin ou pas du tout
 
 ## Postes
 Créer NON
-Update ? slm admin pour modifier champ accessibilité
+Read ->tout le monde pour afficher sur carte pdt parcours (sans images), admin Créer de nouveaux parcours
+Update ->slm Superadmin pour modifier champ accessibilité
 Delete NON
-Read tout le monde pour afficher sur carte pdt parcours (sans images), admin Créer de nouveaux parcours
 
 ## Resultats
 Créer -> à travers complétion parcours si authentifié
+Read ->pour afficher les scores sur l'utilisateur et pour la page statistiques parcours
 Update NON
 Delete -> si parcours est supprimer
-Read pour afficher les scores sur l'utilisateur et pour la page statistiques parcours
 
-## REST
-### Par application
+# REST
+## utilisateurs.js
+GET /api/utilisateurs -> uniquement nom et id
+GET /api/utilisateurs?include=isAdmin -> affichable que par le Superadmin
+GET /api/utilisateurs/:id
+
+POST /api/utilisateurs
+
+PATCH /api/utilisateurs/:id  ((a faire en dernier))
+
+DELETE /api/utilisateurs/:id ((a faire en dernier))
+
+## parcours.js
+GET /api/parcours/ -> uniquement les id, nom, difficulté, descr, nbre postes
+GET /api/parcours?include=user
 GET /api/parcours/:id
-GET /api/resultats?parcours=:id&?include=utilisateurs
-
 GET /api/parcours/:id?include=postes
 
-### Sans connection
+POST /api/parcours
 
-### Connecté
-GET /api/utilisateurs/:id
+PUT /api/parcours/:id
+PATCH /api/parcours/:id
+
+DELETE /api/parcours/:id
+
+## resultats.js
+GET /api/resultats
 GET /api/resultats?utilisateurs=:id&?include=parcours
+GET /api/resultats?parcours=:id&?include=utilisateurs
 
-### Compte Admin
-choix : un admin peut modifier tous les parcours créer
+POST /api/resultats
+
+PATCH /api/resultats/:id
+
+DELETE /api/resultats?parcours=:id
+
+## postes.js
+GET /api/postes
+GET /api/postes/:id 
+
+PATCH /api/postes/:id
