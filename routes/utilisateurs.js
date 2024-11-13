@@ -49,8 +49,6 @@ router.post("/", utils.requireJson, function (req, res, next) {
   new Utilisateur(req.body)
   .save()
   .then(savedPerson => {
-    debug(`Created person "${savedPerson.name}"`);
-
     res
       .status(201)
       .set('Location', `${config.baseUrl}/api/utilisateurs/${savedPerson._id}`)

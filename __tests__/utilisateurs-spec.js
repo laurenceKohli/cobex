@@ -1,18 +1,21 @@
 import supertest from "supertest"
 import app from "../app.js"
+import { cleanUpDatabase } from './utils.js';
 
-
+// Clean up leftover data in the database before each test in this block.
+beforeEach(cleanUpDatabase);
 
 describe('POST /api/utilisateurs', function() {
     it('should create a user', async function() {
         const response = await supertest(app)
             .post('/api/utilisateurs')
             .send({
-            name: 'John Doe',
-            email: 'test@email.com'
+                nom: 'John Doe',
+                mail: 'test@email.com',
+                mdp: 'password'
             })
-            .expect(201);
-        expect(response.body.name).toBe('John Doe');
+        expect(response.status).toBe(201);
+        expect(response.body.nom).toBe('John Doe');
     });
 });
 
