@@ -8,7 +8,13 @@ import Utilisateur from "../models/utilisateur.js";
 const router = express.Router();
 
 router.get("/", function (req, res, next) {
-  res.send("Got a response from the users route");
+  let query = Utilisateur.find()
+  query.exec()
+  .then(people => {
+    console.log(`Found ${people.length} people`);
+    res.send(people);
+  })
+  .catch(next);
 });
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
@@ -51,7 +57,7 @@ router.post("/", utils.requireJson, function (req, res, next) {
   .then(savedPerson => {
     res
       .status(201)
-      .set('Location', `${config.baseUrl}/api/utilisateurs/${savedPerson._id}`)
+      .set('Location', `${config.baseUrl}/utilisateurs/${savedPerson._id}`)
       .send(savedPerson);
   })
   .catch(next);
