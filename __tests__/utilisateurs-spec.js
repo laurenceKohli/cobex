@@ -28,5 +28,7 @@ describe('GET /api/utilisateurs', function() {
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].nom).toBe('John Doe');
+        expect(!response.body[0].mail);
+        expect(!response.body[0].mdp);
     });
 });

@@ -12,43 +12,28 @@ router.get("/", function (req, res, next) {
   query.exec()
   .then(people => {
     console.log(`Found ${people.length} people`);
-    res.send(people);
+    res.send(people.map(person => {
+      return {
+        id: person._id,
+        nom: person.nom
+      };
+    }));
   })
   .catch(next);
 });
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
-  res.send(`Got a response from route /utilisateurs/${req.params.id}`);
-});
-
-router.get("/api/utilisateurs", utils.GetQuerryParams, function (req, res, next) {
-  //remplacer la constante par DB lorsqu'elle une fois DB prête
-  const utilisateurs = [
-    {
-      "id": "1",
-      "nom": "John Doe",
-      "email": ""
-    },
-    {
-      "id": "2",
-      "nom": "Jane Doe",
-      "email": ""
-    },
-    {
-      "id": "3",
-      "nom": "John Smith",
-      "email": ""
+  let query = Utilisateur.find({ _id : (req.params.id) })
+  query.exec()
+  .then(person => {
+    if (person) {
+      res.send({
+        id: person._id,
+        nom: person.nom
+      });
     }
-  ]
-  let infoUtilisateurs = "";
-  utilisateurs.forEach(utilisateur => {
-    infoUtilisateurs += `{
-      "nom": ${utilisateur.nom}, 
-      "id": ${utilisateur.id}
-    },
-    `;
-  });
-  res.send(infoUtilisateurs);
+  })
+  .catch(next);
 });
 
 router.post("/", utils.requireJson, function (req, res, next) {
