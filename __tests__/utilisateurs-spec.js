@@ -5,10 +5,10 @@ import { cleanUpDatabase } from './utils.js';
 // Clean up leftover data in the database before each test in this block.
 beforeEach(cleanUpDatabase);
 
-describe('POST /api/utilisateurs', function() {
+describe('POST /utilisateurs', function() {
     it('should create a user', async function() {
         const response = await supertest(app)
-            .post('/api/utilisateurs')
+            .post('/utilisateurs')
             .send({
                 nom: 'John Doe',
                 mail: 'test@email.com',
@@ -19,6 +19,6 @@ describe('POST /api/utilisateurs', function() {
     });
 });
 
-describe('GET /api/utilisateurs', function() {
+describe('GET /utilisateurs', function() {
     test.todo('should retrieve the list of users');
 });
