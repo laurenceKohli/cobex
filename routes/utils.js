@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ObjectId = mongoose.Types.ObjectId;
 
-function VerfyID(req, res, next) {
+function VerifyID(req, res, next) {
   if (!ObjectId.isValid(req.params.id)) {
     res.send("Invalid ID");
   }else{
@@ -10,4 +10,13 @@ function VerfyID(req, res, next) {
   }
 }
 
-export { VerfyID };
+function GetQuerryParams(req, res, next) {
+    let query = req.query;
+    if (query.length > 0) {
+        res.send(query);
+    } else {
+        next();
+    }
+}
+
+export { VerifyID, GetQuerryParams };
