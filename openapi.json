@@ -5,36 +5,139 @@
     "version": "1.0.0",
     "title": "API Course orientation Bex"
   },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "utilisateurs",
+      "description": "Opérations à propos des utilisateurs."
+    }
+  ],
   "paths": {
-    "/users/{id}": {
-      "get": {
-        "summary": "Request a user's information.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the user."
-          }
+    "/utilisateurs": {
+      "post": {
+        "summary": "Créer un nouvel utilisateur.",
+        "tags": [
+          "utilisateurs"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string",
-                    "description": "First name of the user.",
-                    "example": "John"
-                  },
-                  "lastName": {
-                    "type": "string",
-                    "description": "Last name of the user.",
-                    "example": "Doe"
-                  }
+                "$ref": "#/components/schemas/UserData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur créé avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "mail",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          },
+          "estAdmin": {
+            "type": "boolean",
+            "description": "indique si l'utilisateur est administrateur",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création de l'utilisateur",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "mail",
+          "mdp",
+          "estAdmin",
+          "createdAt"
+        ]
+      },
+      "UserData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "string",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          }
+        },
+        "required": [
+          "nom",
+          "mail",
+          "mdp"
+        ]
+      },
+      "PartialUserData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
           }
         }
       }

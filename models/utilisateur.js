@@ -65,7 +65,7 @@ utilisateurSchema.set('toJSON', {
 function validatePersonNameUniqueness(value) {
     return this.constructor
         .findOne()
-        .where('name')
+        .where('nom')
         .equals(value)
         .exec()
         .then(existingPerson => {
