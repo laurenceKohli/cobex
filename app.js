@@ -6,7 +6,7 @@ import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/utilisateurs.js";
 
 import mongoose from 'mongoose';
-mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost/cobex');
+mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/');
 
 const app = express();
 

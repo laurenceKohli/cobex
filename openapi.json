@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "description": "This API is awesome.",
+    "description": "Cette API permet de gérer les différentes composantes de la course d'orientation fixe de Bex.",
     "version": "1.0.0",
-    "title": "Awesome API"
+    "title": "API Course orientation Bex"
   },
   "paths": {
     "/users/{id}": {
