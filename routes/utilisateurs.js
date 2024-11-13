@@ -1,5 +1,9 @@
 import express from "express";
+import mongoose from "mongoose";
+
+import * as config from '../config.js';
 import * as utils from "./utils.js";
+import Utilisateur from "../models/utilisateur.js";
 
 const router = express.Router();
 
@@ -39,6 +43,20 @@ router.get("/api/utilisateurs", utils.GetQuerryParams, function (req, res, next)
     `;
   });
   res.send(infoUtilisateurs);
+});
+
+router.post("/", utils.requireJson, function (req, res, next) {
+  new Utilisateur(req.body)
+  .save()
+  .then(savedPerson => {
+    debug(`Created person "${savedPerson.name}"`);
+
+    res
+      .status(201)
+      .set('Location', `${config.baseUrl}/api/utilisateurs/${savedPerson._id}`)
+      .send(savedPerson);
+  })
+  .catch(next);
 });
 
 export default router;

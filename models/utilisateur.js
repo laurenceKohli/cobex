@@ -53,7 +53,7 @@ const utilisateurSchema = new Schema({
 });
 
 // Customize the behavior of person.toJSON() (called when using res.send)
-personSchema.set('toJSON', {
+utilisateurSchema.set('toJSON', {
     transform: transformJsonPerson, // Modify the serialized JSON with a custom function
     virtuals: true // Include virtual properties when serializing documents to JSON
 });
