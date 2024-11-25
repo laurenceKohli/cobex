@@ -5,36 +5,456 @@
     "version": "1.0.0",
     "title": "API Course orientation Bex"
   },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "utilisateurs",
+      "description": "Opérations à propos des utilisateurs."
+    }
+  ],
   "paths": {
-    "/users/{id}": {
-      "get": {
-        "summary": "Request a user's information.",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "The unique identifier of the user."
-          }
+    "/utilisateurs": {
+      "post": {
+        "summary": "Créer un nouvel utilisateur.",
+        "tags": [
+          "utilisateurs"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "firstName": {
-                    "type": "string",
-                    "description": "First name of the user.",
-                    "example": "John"
-                  },
-                  "lastName": {
-                    "type": "string",
-                    "description": "Last name of the user.",
-                    "example": "Doe"
-                  }
+                "$ref": "#/components/schemas/UserData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Utilisateur créé avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
                 }
               }
             }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Poste": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du poste",
+            "example": "d038e6fedc4cf8b5ace5a689"
+          },
+          "geoloc": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "integer",
+                "description": "Latitude du poste",
+                "example": "567 462"
+              },
+              "long": {
+                "type": "integer",
+                "description": "Longitude du poste",
+                "example": "123 440"
+              }
+            },
+            "description": "Coordonnées du poste"
+          },
+          "number": {
+            "type": "integer",
+            "description": "Le numéro de poste tel que inscrit sur la carte globale",
+            "minimum": 30,
+            "exclusiveMinimum": true,
+            "example": "37"
+          },
+          "estAccessible": {
+            "type": "boolean",
+            "description": "Indique si le poste est accessible actuellement",
+            "example": true
+          },
+          "images": {
+            "type": "array",
+            "description": "Toutes les images qui sont liées au poste",
+            "items": {
+              "type": "string",
+              "format": "url"
+            }
+          },
+          "descr": {
+            "type": "string",
+            "description": "Descritpion du poste",
+            "example": "A gauche de ce poste se trouve l'arbre cententaire..."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création du résultat",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "geoloc",
+          "number",
+          "estAccessible",
+          "createdAt"
+        ]
+      },
+      "PartialPosteData": {
+        "id": {
+          "type": "string",
+          "description": "Identifiant unique du poste",
+          "example": "d038e6fedc4cf8b5ace5a689"
+        },
+        "geoloc": {
+          "type": "object",
+          "properties": {
+            "lat": {
+              "type": "integer",
+              "description": "Latitude du poste",
+              "example": "567 462"
+            },
+            "long": {
+              "type": "integer",
+              "description": "Longitude du poste",
+              "example": "123 440"
+            }
+          },
+          "description": "Coordonnées du poste"
+        },
+        "estAccessible": {
+          "type": "boolean",
+          "description": "Indique si le poste est accessible actuellement",
+          "example": true
+        },
+        "images": {
+          "type": "array",
+          "description": "Toutes les images qui sont liées au poste",
+          "items": {
+            "type": "string",
+            "format": "url"
+          }
+        },
+        "descr": {
+          "type": "string",
+          "description": "Descritpion du poste",
+          "example": "A gauche de ce poste se trouve l'arbre cententaire..."
+        }
+      },
+      "Resultat": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du résultat",
+            "example": "6cf8e6fedc4cf8b5ace5a689"
+          },
+          "temps": {
+            "type": "integer",
+            "description": "Temps en secondes mis pour faire le parcours",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "example": "600"
+          },
+          "userID": {
+            "type": "string",
+            "description": "L'identifiant unique de la personne qui a fait ce temps",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "trailID": {
+            "type": "string",
+            "description": "L'identifiant unique du parcours finalisé",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création du résultat",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "temps",
+          "userID",
+          "trailID",
+          "createdAt"
+        ]
+      },
+      "ResultatData": {
+        "properties": {
+          "temps": {
+            "type": "integer",
+            "description": "Temps en secondes mis pour faire le parcours",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "example": "600"
+          },
+          "userID": {
+            "type": "string",
+            "description": "L'identifiant unique de la personne qui a fait ce temps",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "trailID": {
+            "type": "string",
+            "description": "L'identifiant unique du parcours finalisé",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          }
+        },
+        "required": [
+          "temps",
+          "userID",
+          "trailID"
+        ]
+      },
+      "Trail": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du parcours",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Nom du parcours",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "Printemps 1"
+          },
+          "difficulte": {
+            "type": "string",
+            "description": "Difficulté du parcours",
+            "enum": [
+              "facile",
+              "moyen",
+              "difficle",
+              "très difficle"
+            ],
+            "example": "facile"
+          },
+          "descr": {
+            "type": "string",
+            "description": "Descriptif du parcours",
+            "example": "Ce parcours peut se faire en famille avec une poucette..."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création de l'utilisateur",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "L'identifiant unique de la personne qui a créé le parcours",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "postesInclus": {
+            "type": "array",
+            "description": "La liste des postes qui sont dans le parcours",
+            "items": {
+              "type": "string"
+            },
+            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "difficulte",
+          "descr",
+          "createdAt",
+          "createdBy",
+          "postesInclus"
+        ]
+      },
+      "TrailData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "Nom du parcours",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "Printemps 1"
+          },
+          "difficulte": {
+            "type": "string",
+            "description": "Difficulté du parcours",
+            "enum": [
+              "facile",
+              "moyen",
+              "difficle",
+              "très difficle"
+            ],
+            "example": "facile"
+          },
+          "descr": {
+            "type": "string",
+            "description": "Descriptif du parcours",
+            "example": "Ce parcours peut se faire en famille avec une poucette..."
+          },
+          "postesInclus": {
+            "type": "array",
+            "description": "La liste des postes qui sont dans le parcours",
+            "items": {
+              "type": "string"
+            },
+            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+          }
+        },
+        "required": [
+          "nom",
+          "difficulte",
+          "descr",
+          "postesInclus"
+        ]
+      },
+      "PartialTrailData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du parcours",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Nom du parcours",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "Printemps 1"
+          },
+          "difficulte": {
+            "type": "string",
+            "description": "Difficulté du parcours",
+            "enum": [
+              "facile",
+              "moyen",
+              "difficle",
+              "très difficle"
+            ],
+            "example": "facile"
+          },
+          "descr": {
+            "type": "string",
+            "description": "Descriptif du parcours",
+            "example": "Ce parcours peut se faire en famille avec une poucette..."
+          },
+          "postesInclus": {
+            "type": "array",
+            "description": "La liste des postes qui sont dans le parcours",
+            "items": {
+              "type": "string"
+            },
+            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "mail",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          },
+          "estAdmin": {
+            "type": "boolean",
+            "description": "indique si l'utilisateur est administrateur",
+            "example": false
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création de l'utilisateur",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "mail",
+          "mdp",
+          "estAdmin",
+          "createdAt"
+        ]
+      },
+      "UserData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "string",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          }
+        },
+        "required": [
+          "nom",
+          "mail",
+          "mdp"
+        ]
+      },
+      "PartialUserData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
           }
         }
       }
