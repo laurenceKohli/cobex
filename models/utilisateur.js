@@ -39,12 +39,10 @@ const utilisateurSchema = new Schema({
     },
     mdp: {
         type: String,
-        //TODO : modifier la donnée pour qu'elle soit cryptée
         required: true,
     },
     role: {
         type: String,
-        required: true,
         enum: ['utilisateur', 'admin', 'superAdmin'],
         default: 'utilisateur',
     },
