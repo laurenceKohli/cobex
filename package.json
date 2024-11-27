@@ -8,9 +8,11 @@
     "test": "cross-env DATABASE_URL=mongodb://127.0.0.1/my-app-test node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "debug": "^4.3.4",
     "express": "^4.21.0",
     "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.0",
     "morgan": "^1.10.0",
     "swagger-ui-express": "^5.0.1"
