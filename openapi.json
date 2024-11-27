@@ -114,7 +114,7 @@
         ]
       },
       "PartialPosteData": {
-        "id": {
+        "properties": {"id": {
           "type": "string",
           "description": "Identifiant unique du poste",
           "example": "d038e6fedc4cf8b5ace5a689"
@@ -152,7 +152,7 @@
           "type": "string",
           "description": "Descritpion du poste",
           "example": "A gauche de ce poste se trouve l'arbre cententaire..."
-        }
+        }}
       },
       "Resultat": {
         "type": "object",
@@ -391,10 +391,15 @@
             "example": "SuperMotDePasse",
             "format": "password"
           },
-          "estAdmin": {
-            "type": "boolean",
-            "description": "indique si l'utilisateur est administrateur",
-            "example": false
+          "role": {
+            "type": "string",
+            "description": "Rôle de l'utilisateur",
+            "enum": [
+              "utilisateur",
+              "admin",
+              "superAdmin"
+            ],
+            "example": "utilisateur"
           },
           "createdAt": {
             "type": "string",

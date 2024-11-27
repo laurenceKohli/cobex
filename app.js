@@ -4,6 +4,7 @@ import logger from "morgan";
 
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/utilisateurs.js";
+import postesRouter from "./routes/postes.js";
 
 import mongoose from 'mongoose';
 mongoose.connect(process.env.DATABASE_URL || 'mongodb://localhost:27017/');
@@ -26,6 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use("/", indexRouter);
 app.use("/api/utilisateurs", usersRouter);
+app.use("/api/postes", postesRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
