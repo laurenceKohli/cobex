@@ -42,9 +42,11 @@ const utilisateurSchema = new Schema({
         //TODO : modifier la donnée pour qu'elle soit cryptée
         required: true,
     },
-    estAdmin: {
-        type: Boolean,
-        default: false
+    role: {
+        type: String,
+        required: true,
+        enum: ['utilisateur', 'admin', 'superAdmin'],
+        default: 'utilisateur',
     },
     createdAt: {
         type: Date,
