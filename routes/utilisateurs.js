@@ -63,8 +63,8 @@ router.post("/", utils.requireJson, function (req, res, next) {
   })
   .then(savedPerson => {
     res
-      .status(201)
       .set('Location', `${config.baseUrl}/utilisateurs/${savedPerson._id}`)
+      .status(201)
       .send(savedPerson);
   })
   .catch(next);
