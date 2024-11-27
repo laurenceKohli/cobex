@@ -10,7 +10,7 @@ function VerifyID(req, res, next) {
   }
 }
 
-function GetQuerryParams(req, res, next) {
+function GetQueryParams(req, res, next) {
     let query = req.query;
     if (query.length > 0) {
         res.send(query);
@@ -28,4 +28,4 @@ function requireJson(req, res, next) {
   next(error);
 }
 
-export { VerifyID, GetQuerryParams, requireJson };
+export { VerifyID, GetQueryParams, requireJson };
