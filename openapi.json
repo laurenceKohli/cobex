@@ -27,7 +27,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserData"
+                "$ref": "#/components/schemas/PersonData"
               }
             }
           }
@@ -38,7 +38,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/Person"
                 }
               }
             }
@@ -364,7 +364,7 @@
           }
         }
       },
-      "User": {
+      "Person": {
         "type": "object",
         "properties": {
           "id": {
@@ -417,7 +417,7 @@
           "createdAt"
         ]
       },
-      "UserData": {
+      "PersonData": {
         "type": "object",
         "properties": {
           "nom": {
@@ -446,7 +446,7 @@
           "mdp"
         ]
       },
-      "PartialUserData": {
+      "PartialPersonData": {
         "type": "object",
         "properties": {
           "id": {

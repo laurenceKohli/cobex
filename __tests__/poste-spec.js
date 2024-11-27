@@ -6,7 +6,7 @@ import { cleanUpDatabase } from './utils.js';
 // beforeEach(cleanUpDatabase);
 
 describe('POST /api/postes', function() {
-    // cleanUpDatabase();
+    cleanUpDatabase();
     it('should create a poste', async function() {
         const response = await supertest(app)
             .post('/api/postes')
