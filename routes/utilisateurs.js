@@ -13,7 +13,7 @@ const signJwt = promisify(jwt.sign);
 
 const router = express.Router();
 
-router.get("/", utils.GetQueryParams, Authorise, function (req, res, next) {
+router.get("/", utils.GetQueryParams, function (req, res, next) {
   let include = false;
   if (req.query) {
     include = req.query.include;
@@ -23,18 +23,22 @@ router.get("/", utils.GetQueryParams, Authorise, function (req, res, next) {
   .then(people => {
     res.send(people.map(person => {
       if (include) {
-        if (include.includes("role") && req.currentUserRole === "superAdmin") {
-          return {
-            id: person._id,
-            nom: person.nom,
-            role: person.role
-          };
+        if (include.includes("role") ) {
+          Authorise(req, res, next);
+          if (req.currentUserRole === "superAdmin") {
+            return {
+              id: person._id,
+              nom: person.nom,
+              role: person.role
+            };
+          }
         }
+      } else {
+        return {
+          id: person._id,
+          nom: person.nom
+        };
       }
-      return {
-        id: person._id,
-        nom: person.nom
-      };
     }));
   })
   .catch(next);
@@ -58,6 +62,7 @@ router.post("/", utils.requireJson, function (req, res, next) {
   let hash = bcrypt.hash( (req.body.mdp), config.bcryptCostFactor)
   .then(hash => {
     req.body.mdp = hash;
+    req.body.role = "utilisateur";
     const nouvelUtilisateur = new Utilisateur(req.body);
     return nouvelUtilisateur.save()
   })

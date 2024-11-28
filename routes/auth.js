@@ -19,12 +19,12 @@ function Authorise(req, res, next) {
     req.currentUserId = payload.sub;
     Utilisateur.findOne({ _id : req.currentUserId })
     .exec()
-    .then(utilisateur => { 
+    .then(utilisateur => {
+      if (!utilisateur) return res.status(401).send("Bearer token no longer corresponds to a user");
       req.currentUserRole = utilisateur.role;
       return next();
     })
   })
-  return next();
 }
 
 export { Authorise };
