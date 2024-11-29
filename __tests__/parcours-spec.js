@@ -1,10 +1,8 @@
 import supertest from "supertest"
 import app from "../app.js"
-import { cleanUpDatabase } from './utils.js';
 import Utilisateur from '../models/utilisateur.js';
 import Poste from '../models/poste.js';
 
-cleanUpDatabase();
 describe('POST /api/parcours', function () {
     it('should create a parcours', async function () {
         // Create 2 posts in the database before test in this block.

@@ -1,12 +1,7 @@
 import supertest from "supertest"
 import app from "../app.js"
-import { cleanUpDatabase } from './utils.js';
-
-// Clean up leftover data in the database before each test in this block.
-// beforeEach(cleanUpDatabase);
 
 describe('POST /api/utilisateurs', function() {
-    cleanUpDatabase();
     it('should create a user', async function() {
         const response = await supertest(app)
             .post('/api/utilisateurs')
