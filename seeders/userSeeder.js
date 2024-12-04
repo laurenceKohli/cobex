@@ -1,4 +1,6 @@
 import Utilisateur from '../models/utilisateur.js';
+import bcrypt from "bcrypt";
+import * as config from '../config.js';
 
 export async function seedUser() {
 
@@ -6,22 +8,22 @@ export async function seedUser() {
         {
             nom: 'Jane Doe',
             mail: 'jane.doe@example.com',
-            mdp: 'password',
+            mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym',
             role: 'admin'
         },
         {
             nom: 'John Doe',
             mail: 'john@example.com',
-            mdp: 'password',
+            mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym',
         }
     ];
 
     try {
         await Utilisateur.deleteMany(); // Empty the collection before seeding
         await Utilisateur.insertMany(users);
-        console.log('Utilisateur have been seeded successfully.');
+        console.log('Utilisateurs have been seeded successfully.');
     } catch (error) {
-        console.error('Error seeding utilisateur:', error);
+        console.error('Error seeding utilisateurs:', error);
     }
 
     //retour les id des postes
