@@ -37,16 +37,16 @@ DELETE /api/utilisateurs/:id ((a faire en dernier))
 
 ## parcours.js
 GET /api/parcours/ -> uniquement les id, nom, difficulté, descr, nbre postes
-GET /api/parcours?include=user
+GET /api/parcours?include=user -> + nom du créateur du parcours
 GET /api/parcours/:id
 GET /api/parcours/:id?include=postes
 
-POST /api/parcours
+POST /api/parcours -> admin ou superAdmin
 
-PUT /api/parcours/:id
-PATCH /api/parcours/:id
+PUT /api/parcours/:id -> superAdmin ou créateur
+PATCH /api/parcours/:id -> superAdmin ou créateur
 
-DELETE /api/parcours/:id
+DELETE /api/parcours/:id -> superAdmin ou créateur
 
 ## resultats.js
 GET /api/resultats

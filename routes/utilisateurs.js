@@ -13,7 +13,8 @@ const signJwt = promisify(jwt.sign);
 
 const router = express.Router();
 
-router.get("/", utils.GetQueryParams, function (req, res, next) {
+//Authorise(false) --> authentification optionnelle 
+router.get("/", Authorise(false), function (req, res, next) {
   let include = false;
   if (req.query) {
     include = req.query.include;
@@ -24,13 +25,16 @@ router.get("/", utils.GetQueryParams, function (req, res, next) {
     res.send(people.map(person => {
       if (include) {
         if (include.includes("role") ) {
-          Authorise(req, res, next);
           if (req.currentUserRole === "superAdmin") {
             return {
               id: person._id,
               nom: person.nom,
               role: person.role
             };
+          }else if (req.currentUserRole) {
+            return res.status(403).send("Forbidden");
+          }else {
+            return res.status(401).send("Unauthorized");
           }
         }
       } else {
