@@ -1,9 +1,6 @@
 import Utilisateur from '../models/utilisateur.js';
-import bcrypt from "bcrypt";
-import * as config from '../config.js';
 
-export async function seedUser() {
-
+export function seedUser() {
     const users = [
         {
             nom: 'Jane Doe',
@@ -18,14 +15,15 @@ export async function seedUser() {
         }
     ];
 
-    try {
-        await Utilisateur.deleteMany(); // Empty the collection before seeding
-        await Utilisateur.insertMany(users);
-        console.log('Utilisateurs have been seeded successfully.');
-    } catch (error) {
-        console.error('Error seeding utilisateurs:', error);
-    }
-
-    //retour les id des postes
-    return Utilisateur.find();
+    return Utilisateur.deleteMany() // Empty the collection before seeding
+        .then(() => {
+            return Utilisateur.insertMany(users);
+        })
+        .then((utilisateurs) => {
+            console.log('Utilisateurs have been seeded successfully.');
+            return utilisateurs;
+        })
+        .catch(error => {
+            console.error('Error seeding utilisateurs:', error);
+        });
 }

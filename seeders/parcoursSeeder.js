@@ -1,7 +1,6 @@
 import Parcours from '../models/parcours.js';
 
-export async function seedParcours(user, postes) {
-
+export function seedParcours(user, postes) {
     const trails = [
         {
             nom: 'Parcours Facile',
@@ -19,13 +18,15 @@ export async function seedParcours(user, postes) {
         }
     ];
 
-    try {
-        await Parcours.deleteMany(); // Empty the collection before seeding
-        await Parcours.insertMany(trails);
-        console.log('Parcours have been seeded successfully.');
-    } catch (error) {
-        console.error('Error seeding parcours:', error);
-    } 
-
-    return Parcours.find();
+    return Parcours.deleteMany() // Empty the collection before seeding
+        .then(() => {
+            return Parcours.insertMany(trails);
+        })
+        .then((parcours) => {
+            console.log('Parcours have been seeded successfully.');
+            return parcours;
+        })
+        .catch(error => {
+            console.error('Error seeding parcours:', error);
+        });
 }

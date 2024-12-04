@@ -1,7 +1,6 @@
 import Poste from '../models/poste.js';
 
-export async function seedPostes() {
-
+export function seedPostes() {
     const postes = [
         {
             geoloc: { lat: 2539171.85, long: 1181359.59 },
@@ -23,14 +22,15 @@ export async function seedPostes() {
         }
     ];
 
-    try {
-        await Poste.deleteMany(); // Empty the collection before seeding
-        await Poste.insertMany(postes);
-        console.log('Postes have been seeded successfully.');
-    } catch (error) {
-        console.error('Error seeding postes:', error);
-    } 
-
-    //retour les id des postes
-    return Poste.find();
+    return Poste.deleteMany() // Empty the collection before seeding
+        .then(() => {
+            return Poste.insertMany(postes);
+        })
+        .then((postesCreated) => {
+            console.log('Postes have been seeded successfully.');
+            return postesCreated;
+        })
+        .catch(error => {
+            console.error('Error seeding postes:', error);
+        });
 }
