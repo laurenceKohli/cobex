@@ -1,6 +1,7 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
+import cors from "cors";
 
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/utilisateurs.js";
@@ -14,6 +15,8 @@ const app = express();
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 
+//cors
+app.use(cors());
 
 // Parse the OpenAPI document.
 const openApiDocument = JSON.parse(fs.readFileSync('./openapi.json'));
