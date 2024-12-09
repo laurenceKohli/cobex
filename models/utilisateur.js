@@ -39,12 +39,12 @@ const utilisateurSchema = new Schema({
     },
     mdp: {
         type: String,
-        //TODO : modifier la donnée pour qu'elle soit cryptée
         required: true,
     },
-    estAdmin: {
-        type: Boolean,
-        default: false
+    role: {
+        type: String,
+        enum: ['utilisateur', 'admin', 'superAdmin'],
+        default: 'utilisateur',
     },
     createdAt: {
         type: Date,
@@ -65,7 +65,7 @@ utilisateurSchema.set('toJSON', {
 function validatePersonNameUniqueness(value) {
     return this.constructor
         .findOne()
-        .where('name')
+        .where('nom')
         .equals(value)
         .exec()
         .then(existingPerson => {

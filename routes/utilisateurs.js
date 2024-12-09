@@ -1,62 +1,95 @@
 import express from "express";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { promisify } from "util";
 
 import * as config from '../config.js';
 import * as utils from "./utils.js";
+import { Authorise } from "./auth.js";
 import Utilisateur from "../models/utilisateur.js";
+
+const signJwt = promisify(jwt.sign);
 
 const router = express.Router();
 
-router.get("/", function (req, res, next) {
-  res.send("Got a response from the users route");
+router.get("/", utils.GetQueryParams, function (req, res, next) {
+  let include = false;
+  if (req.query) {
+    include = req.query.include;
+  }
+  let query = Utilisateur.find()
+  query.exec()
+  .then(people => {
+    res.send(people.map(person => {
+      if (include) {
+        if (include.includes("role") ) {
+          Authorise(req, res, next);
+          if (req.currentUserRole === "superAdmin") {
+            return {
+              id: person._id,
+              nom: person.nom,
+              role: person.role
+            };
+          }
+        }
+      } else {
+        return {
+          id: person._id,
+          nom: person.nom
+        };
+      }
+    }));
+  })
+  .catch(next);
 });
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
-  res.send(`Got a response from route /utilisateurs/${req.params.id}`);
-});
-
-router.get("/api/utilisateurs", utils.GetQuerryParams, function (req, res, next) {
-  //remplacer la constante par DB lorsqu'elle une fois DB prête
-  const utilisateurs = [
-    {
-      "id": "1",
-      "nom": "John Doe",
-      "email": ""
-    },
-    {
-      "id": "2",
-      "nom": "Jane Doe",
-      "email": ""
-    },
-    {
-      "id": "3",
-      "nom": "John Smith",
-      "email": ""
+  let query = Utilisateur.find({ _id : (req.params.id) })
+  query.exec()
+  .then(person => {
+    if (person) {
+      res.send({
+        id: person._id,
+        nom: person.nom
+      });
     }
-  ]
-  let infoUtilisateurs = "";
-  utilisateurs.forEach(utilisateur => {
-    infoUtilisateurs += `{
-      "nom": ${utilisateur.nom}, 
-      "id": ${utilisateur.id}
-    },
-    `;
-  });
-  res.send(infoUtilisateurs);
+  })
+  .catch(next);
 });
 
 router.post("/", utils.requireJson, function (req, res, next) {
-  new Utilisateur(req.body)
-  .save()
+  let hash = bcrypt.hash( (req.body.mdp), config.bcryptCostFactor)
+  .then(hash => {
+    req.body.mdp = hash;
+    req.body.role = "utilisateur";
+    const nouvelUtilisateur = new Utilisateur(req.body);
+    return nouvelUtilisateur.save()
+  })
   .then(savedPerson => {
-    debug(`Created person "${savedPerson.name}"`);
-
     res
+      .set('Location', `${config.baseUrl}/utilisateurs/${savedPerson._id}`)
       .status(201)
-      .set('Location', `${config.baseUrl}/api/utilisateurs/${savedPerson._id}`)
       .send(savedPerson);
   })
   .catch(next);
+});
+
+router.post("/login", function (req, res, next) {
+  Utilisateur.findOne({ nom : req.body.nom })
+    .exec()
+    .then(utilisateur => {
+      if (!utilisateur) return res.sendStatus(401); // Unauthorized
+      return bcrypt.compare(req.body.mdp, utilisateur.mdp).then(valid => {
+        if (!valid) return res.sendStatus(401); // Unauthorized
+        // Login is valid...
+        const exp = Math.floor((Date.now() / 1000) + 60 * 60 * 24);
+        return signJwt({ sub: utilisateur._id, exp: exp }, config.secret).then(token => {
+          res.send({ message: `Welcome ${utilisateur.nom}!`, token });
+        });
+      });
+    })
+    .catch(next);
 });
 
 export default router;
