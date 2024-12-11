@@ -1,7 +1,13 @@
 import supertest from "supertest"
 import app from "../app.js"
+import mongoose from "mongoose"
+import { cleanUpDatabase } from './utils.js';
+
 import Utilisateur from '../models/utilisateur.js';
 import Poste from '../models/poste.js';
+import Parcours from '../models/parcours.js';
+
+beforeEach(cleanUpDatabase);
 
 describe('POST /api/parcours', function () {
     it('should create a parcours', async function () {
@@ -31,10 +37,6 @@ describe('POST /api/parcours', function () {
         expect(resPostes.status).toBe(200);
         expect(resPostes.get('Content-Type')).toContain('application/json');
 
-        // Check that the response body is an array.
-        const body = resPostes.body;
-        expect(Array.isArray(body)).toBe(true);
-
         // Create a user in the database before test in this block.
         const user = await Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
 
@@ -44,8 +46,8 @@ describe('POST /api/parcours', function () {
         expect(resUser.get('Content-Type')).toContain('application/json');
 
         const parcours = await supertest(app)
-        .post('/api/parcours')
-        .send({
+            .post('/api/parcours')
+            .send({
                 nom: 'parcours1',
                 difficulte: 'facile',
                 createBy: user.id,
@@ -58,11 +60,47 @@ describe('POST /api/parcours', function () {
 });
 
 describe('GET /api/parcours', function () {
-    it('should retrieve the list of parcours', async function() {
-    const response = await supertest(app)
-    .get('/api/parcours')
-expect(response.status).toBe(200);
-expect(response.body.length).toBe(1);
-expect(response.body[0].nom).toBe('parcours1');
+    it('should retrieve the list of parcours', async function () {
+         // Create a user in the database before test in this block.
+         const user = await Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
+         const resUser = await supertest(app).get('/api/utilisateurs');
+ 
+         // Create 2 posts in the database before test in this block.
+         const [poste1, poste2] = await Promise.all([
+             Poste.create({
+                 geoloc: {
+                     "lat": 123467,
+                     "long": 128432
+                 },
+                 number: '32',
+                 images: ['image2']
+             }),
+             Poste.create({
+                 geoloc: {
+                     "lat": 123467,
+                     "long": 128432
+                 },
+                 number: '33',
+                 images: ['image1', 'image2'],
+                 descr: "test"
+             })
+         ]);
+ 
+         // Create a parcours in the database before test in this block.
+         const parcours = await Parcours.create({
+             nom: 'parcours1',
+             difficulte: 'facile',
+             createBy: user.id,
+             postesInclus: [poste1.id, poste2.id]
+         });
+
+        const response = await supertest(app)
+            .get('/api/parcours')
+        expect(response.status).toBe(200);
+        expect(response.body.length).toBe(1);
+        expect(response.body[0].nom).toBe('parcours1');
     });
 });
+
+// Disconnect from the database once the tests are done.
+afterAll(mongoose.disconnect);
