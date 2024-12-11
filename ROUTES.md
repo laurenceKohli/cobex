@@ -19,8 +19,8 @@ Delete NON
 
 ## Resultats
 Créer -> à travers complétion parcours si authentifié
-Read ->pour afficher les scores sur l'utilisateur et pour la page statistiques parcours
-Update NON
+Read -> pour afficher les scores sur l'utilisateur et pour la page statistiques parcours
+Update -> si une personne supprime son compte
 Delete -> si parcours est supprimer
 
 # REST
@@ -55,7 +55,7 @@ GET /api/resultats?parcours=:id&?include=utilisateurs
 
 POST /api/resultats
 
-PATCH /api/resultats/:id
+PATCH /api/resultats/:userId
 
 DELETE /api/resultats?parcours=:id
 
