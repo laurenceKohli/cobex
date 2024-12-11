@@ -13,7 +13,7 @@ export async function cleanUpDatabase() {
 }
 
 export function createUser(){
-    return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
+    return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym' });
 }
 
 export function createPoste(){

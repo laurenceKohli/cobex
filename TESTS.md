@@ -1,5 +1,5 @@
 # Intitulés des Tests
-Nombre total de test : 9
+Nombre total de test : 11
 
 ## utilisateurs-spec.js
 1. `POST /api/utilisateurs`
@@ -8,6 +8,8 @@ Nombre total de test : 9
    - `should retrieve the list of users`
 3. `GET /api/utilisateurs/:id`
    - `should retrieve one user`
+4. `POST /api/utilisateurs/login`
+   - `should valid or not login`
 TODO
 GET /api/utilisateurs?include=isAdmin
 ## resultat-spec.js
@@ -39,7 +41,7 @@ GET :id
 GET /api/parcours/:id?include=postes
 GET /api/parcours?include=user
 PUT
-PATCH
-DELETE
+!! PATCH
+!! DELETE
 ## example-spec.js
 1. `should work`
