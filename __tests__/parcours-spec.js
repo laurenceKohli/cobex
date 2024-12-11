@@ -49,6 +49,26 @@ describe('GET /api/parcours', function () {
         expect(response.body[0].nom).toBe('parcours1');
     });
 });
+//TODO tester aussi que si on a pas le ID c'est erreur 404 quand test ID
+
+describe('DELETE /api/parcours/:id', function () {
+    it('should delete the parcours', async function () { 
+         // Create a parcours in the database before test in this block.
+         const parcours = await createParcours();
+
+        const response = await supertest(app)
+            .delete('/api/parcours'+ parcours.id)
+        expect(response.status).toBe(200);
+        //TODO si retourne qqch alors le controler
+
+        expect(await Parcours.findById(parcours.id)).toBe(null);
+
+        // const response2 = await supertest(app)
+        //     .get('/api/parcours')
+        // expect(response2.status).toBe(200);
+        // expect(response2.body.length).toBe(0);
+    });
+});
 
 // Disconnect from the database once the tests are done.
 afterAll(mongoose.disconnect);

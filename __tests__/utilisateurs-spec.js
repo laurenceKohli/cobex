@@ -47,6 +47,7 @@ describe('GET /api/utilisateurs/:id', function() {
         expect(!response.body.mdp);
     });
 });
+//TODO tester aussi que si on a pas le ID c'est erreur 404 quand test ID
 
 // Disconnect from the database once the tests are done.
 afterAll(mongoose.disconnect);
