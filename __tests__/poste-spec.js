@@ -1,9 +1,7 @@
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
-import { cleanUpDatabase } from './utils.js';
-
-import Poste from '../models/poste.js';
+import { cleanUpDatabase, createPoste } from './utils.js';
 
 beforeEach(cleanUpDatabase);
 
@@ -28,14 +26,7 @@ describe('POST /api/postes', function() {
 describe('GET /api/postes', function() {
     it('should retrieve the list of postes', async function() {
         // Create a poste in the database before test in this block.
-        const poste = await Poste.create({
-            geoloc: {
-                "lat" : 123467, 
-                "long" : 128432
-            },
-            number: '31',
-            images: ['image1', 'image2'],
-        });
+        await createPoste();
 
         const response = await supertest(app)
             .get('/api/postes')

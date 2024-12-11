@@ -1,8 +1,7 @@
 import supertest from "supertest"
 import mongoose from "mongoose"
 import app from "../app.js"
-import Utilisateur from '../models/utilisateur.js';
-import { cleanUpDatabase } from './utils.js';
+import { cleanUpDatabase, createUser } from './utils.js';
 
 beforeEach(cleanUpDatabase);
 
@@ -24,7 +23,7 @@ describe('POST /api/utilisateurs', function() {
 describe('GET /api/utilisateurs', function() {
     it('should retrieve the list of users', async function() {        
         // Create a user in the database before test in this block.
-        const user = await Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
+        const user = await createUser();
 
         const response = await supertest(app)
             .get('/api/utilisateurs')
@@ -36,6 +35,18 @@ describe('GET /api/utilisateurs', function() {
     });
 });
 
+describe('GET /api/utilisateurs/:id', function() {
+    it('should retrieve one user', async function() {        
+        // Create a user in the database before test in this block.
+        const user = await createUser();
+
+        const response = await supertest(app)
+            .get('/api/utilisateurs/' + user.id)
+        expect(response.status).toBe(200);
+        expect(response.body.nom).toBe('Jane Doe');
+        expect(!response.body.mdp);
+    });
+});
 
 // Disconnect from the database once the tests are done.
 afterAll(mongoose.disconnect);

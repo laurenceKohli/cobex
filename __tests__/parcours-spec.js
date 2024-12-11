@@ -1,36 +1,14 @@
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
-import { cleanUpDatabase } from './utils.js';
-
-import Utilisateur from '../models/utilisateur.js';
-import Poste from '../models/poste.js';
-import Parcours from '../models/parcours.js';
+import { cleanUpDatabase, create2Postes, createParcours, createUser } from './utils.js';
 
 beforeEach(cleanUpDatabase);
 
 describe('POST /api/parcours', function () {
     it('should create a parcours', async function () {
         // Create 2 posts in the database before test in this block.
-        const [poste1, poste2] = await Promise.all([
-            Poste.create({
-                geoloc: {
-                    "lat": 123467,
-                    "long": 128432
-                },
-                number: '32',
-                images: ['image2']
-            }),
-            Poste.create({
-                geoloc: {
-                    "lat": 123467,
-                    "long": 128432
-                },
-                number: '33',
-                images: ['image1', 'image2'],
-                descr: "test"
-            })
-        ]);
+        const [poste1, poste2] = await create2Postes();
 
         const resPostes = await supertest(app).get('/api/postes')
         // Check that the status and headers of the response are correct.
@@ -38,7 +16,7 @@ describe('POST /api/parcours', function () {
         expect(resPostes.get('Content-Type')).toContain('application/json');
 
         // Create a user in the database before test in this block.
-        const user = await Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
+        const user = await createUser();
 
         const resUser = await supertest(app).get('/api/utilisateurs')
         // Check that the status and headers of the response are correct.
@@ -60,39 +38,9 @@ describe('POST /api/parcours', function () {
 });
 
 describe('GET /api/parcours', function () {
-    it('should retrieve the list of parcours', async function () {
-         // Create a user in the database before test in this block.
-         const user = await Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: 'mdp12' });
-         const resUser = await supertest(app).get('/api/utilisateurs');
- 
-         // Create 2 posts in the database before test in this block.
-         const [poste1, poste2] = await Promise.all([
-             Poste.create({
-                 geoloc: {
-                     "lat": 123467,
-                     "long": 128432
-                 },
-                 number: '32',
-                 images: ['image2']
-             }),
-             Poste.create({
-                 geoloc: {
-                     "lat": 123467,
-                     "long": 128432
-                 },
-                 number: '33',
-                 images: ['image1', 'image2'],
-                 descr: "test"
-             })
-         ]);
- 
+    it('should retrieve the list of parcours', async function () { 
          // Create a parcours in the database before test in this block.
-         const parcours = await Parcours.create({
-             nom: 'parcours1',
-             difficulte: 'facile',
-             createBy: user.id,
-             postesInclus: [poste1.id, poste2.id]
-         });
+         const parcours = await createParcours();
 
         const response = await supertest(app)
             .get('/api/parcours')
