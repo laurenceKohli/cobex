@@ -54,6 +54,7 @@ describe('POST /api/utilisateurs/login', function() {
         // Create a user in the database before test in this block.
         const user = await createUser();
 
+        //valid login
         const response1 = await supertest(app)
             .post('/api/utilisateurs/login')
             .send({
@@ -64,6 +65,7 @@ describe('POST /api/utilisateurs/login', function() {
         expect(response1.body.message).toBe('Welcome Jane Doe!');
         expect(!response1.body.mdp);
 
+        //invalid password
         const response2 = await supertest(app)
             .post('/api/utilisateurs/login')
             .send({
@@ -72,6 +74,7 @@ describe('POST /api/utilisateurs/login', function() {
             })
         expect(response2.status).toBe(401);
 
+        //invalid name
         const response3 = await supertest(app)
             .post('/api/utilisateurs/login')
             .send({

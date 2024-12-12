@@ -1,5 +1,5 @@
 # Intitulés des Tests
-Nombre total de test : 11
+Nombre total de test : 13
 
 ## utilisateurs-spec.js
 1. `POST /api/utilisateurs`
@@ -34,7 +34,13 @@ PATCH
    - `should create a parcours`
 2. `GET /api/parcours`
    - `should retrieve the list of parcours`
-3. `DELETE /api/parcours/:id`
+3. `GET /api/parcours with BODY`
+   - `should retrieve the list of parcours with name of creator`
+4. `GET /api/parcours/:id`
+   - `should retrieve one parcours or not` 
+6. `GET /api/parcours/:id WITH BODY`
+   - `should retrieve one parcours with postes`
+5. `DELETE /api/parcours/:id`
    - `should delete the parcours`
 TODO
 GET :id

@@ -16,6 +16,10 @@ export function createUser(){
     return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym' });
 }
 
+export function createAdminUser(){
+  return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym', role: 'admin' });
+}
+
 export function createPoste(){
   return Poste.create({
         geoloc: {
@@ -51,7 +55,7 @@ export function create2Postes(){
 
 export async function createParcours(userId){
   if(!userId){
-    const user = await createUser();
+    const user = await createAdminUser();
     userId = user.id;
   }
   const [poste1, poste2] = await create2Postes();
