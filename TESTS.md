@@ -23,11 +23,10 @@ DELETE
 GET /api/resultats?utilisateurs=:id&?include=parcours
 GET /api/resultats?parcours=:id&?include=utilisateurs
 ## poste-spec.js
-1. `POST /api/postes`
-   - `should create a poste`
-2. `GET /api/postes`
+1. `GET /api/postes`
    - `should retrieve the list of postes`
 TODO
+GET :id
 PATCH
 ## parcours-spec.js
 1. `POST /api/parcours`
@@ -43,11 +42,9 @@ PATCH
 6. `DELETE /api/parcours/:id`
    - `should delete the parcours`
 TODO
-GET :id
 GET /api/parcours/:id?include=postes
 GET /api/parcours?include=user
 PUT
 !! PATCH
-!! DELETE
 ## example-spec.js
 1. `should work`

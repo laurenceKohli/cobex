@@ -24,7 +24,6 @@ export function giveToken(userID){
     const payload = { sub: userID, exp: exp};
 
     return jwt.sign(payload, config.secret);
-
 }
 
 export function createUser(){
@@ -32,7 +31,7 @@ export function createUser(){
 }
 
 export function createAdminUser(){
-  return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym', role: 'admin' });
+  return Utilisateur.create({ nom: 'John Doe', mail: 'test2@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym', role: 'admin' });
 }
 
 export function createPoste(){
