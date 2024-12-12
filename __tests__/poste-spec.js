@@ -1,5 +1,9 @@
 import supertest from "supertest"
 import app from "../app.js"
+import mongoose from "mongoose"
+import { cleanUpDatabase, createPoste } from './utils.js';
+
+beforeEach(cleanUpDatabase);
 
 describe('POST /api/postes', function() {
     it('should create a poste', async function() {
@@ -21,6 +25,9 @@ describe('POST /api/postes', function() {
 
 describe('GET /api/postes', function() {
     it('should retrieve the list of postes', async function() {
+        // Create a poste in the database before test in this block.
+        await createPoste();
+
         const response = await supertest(app)
             .get('/api/postes')
         expect(response.status).toBe(200);
@@ -28,3 +35,6 @@ describe('GET /api/postes', function() {
         expect(response.body[0].number).toBe(31);
     });
 });
+
+// Disconnect from the database once the tests are done.
+afterAll(mongoose.disconnect);
