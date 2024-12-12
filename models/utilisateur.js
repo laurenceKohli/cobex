@@ -100,4 +100,4 @@ function transformJsonPerson(doc, json, options) {
     return json;
 }
 
-export default mongoose.model('Person', utilisateurSchema);
+export default mongoose.model('Utilisateur', utilisateurSchema);

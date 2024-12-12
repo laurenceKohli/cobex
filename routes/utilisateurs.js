@@ -13,7 +13,8 @@ const signJwt = promisify(jwt.sign);
 
 const router = express.Router();
 
-router.get("/", utils.GetQueryParams, function (req, res, next) {
+//Authorise(false) --> authentification optionnelle 
+router.get("/", Authorise(false), function (req, res, next) {
   let include = false;
   if (req.query) {
     include = req.query.include;
@@ -22,37 +23,39 @@ router.get("/", utils.GetQueryParams, function (req, res, next) {
   query.exec()
   .then(people => {
     res.send(people.map(person => {
-      if (include) {
-        if (include.includes("role") ) {
-          Authorise(req, res, next);
-          if (req.currentUserRole === "superAdmin") {
-            return {
-              id: person._id,
-              nom: person.nom,
-              role: person.role
-            };
-          }
+      if (include?.includes("role") ) {
+        if (req.currentUserRole === "superAdmin") {
+          return {
+            id: person._id,
+            nom: person.nom,
+            role: person.role
+          };
+        }else if (req.currentUserRole) {
+          return res.status(403).send("Forbidden");
+        }else {
+          return res.status(401).send("Unauthorized");
         }
-      } else {
-        return {
-          id: person._id,
-          nom: person.nom
-        };
       }
+      return {
+        id: person._id,
+        nom: person.nom
+      };
+      
     }));
   })
   .catch(next);
 });
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
-  let query = Utilisateur.find({ _id : (req.params.id) })
-  query.exec()
+  Utilisateur.findById(req.params.id).exec()
   .then(person => {
     if (person) {
       res.send({
         id: person._id,
         nom: person.nom
-      });
+      })
+    } else {
+      res.status(404).send("Person not found");
     }
   })
   .catch(next);
@@ -67,10 +70,14 @@ router.post("/", utils.requireJson, function (req, res, next) {
     return nouvelUtilisateur.save()
   })
   .then(savedPerson => {
-    res
-      .set('Location', `${config.baseUrl}/utilisateurs/${savedPerson._id}`)
-      .status(201)
-      .send(savedPerson);
+    const exp = Math.floor((Date.now() / 1000) + 60 * 60 * 24);
+    savedPerson.mdp = undefined;
+    signJwt({ sub: savedPerson._id, exp: exp }, config.secret).then(token => {
+      res
+        .set('Location', `${config.baseUrl}/utilisateurs/${savedPerson._id}`)
+        .status(201)
+        .send({savedPerson, token});
+    });
   })
   .catch(next);
 });
