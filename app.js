@@ -1,6 +1,7 @@
 import express from "express";
 import createError from "http-errors";
 import logger from "morgan";
+import cors from "cors";
 
 import indexRouter from "./routes/index.js";
 import usersRouter from "./routes/utilisateurs.js";
@@ -17,6 +18,12 @@ const app = express();
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 
+//cors
+const corsOptions = {
+  origin: 'https://cobex-frontend.onrender.com',
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 
 // Parse the OpenAPI document.
 const openApiDocument = JSON.parse(fs.readFileSync('./openapi.json'));
