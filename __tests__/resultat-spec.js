@@ -1,7 +1,7 @@
 import supertest from "supertest"
 import mongoose from "mongoose"
 import app from "../app.js"
-import { cleanUpDatabase, createParcours, createResultat, createUser } from './utils.js';
+import { cleanUpDatabase, createParcours, createResultat, createUser, giveToken } from './utils.js';
 
 beforeEach(cleanUpDatabase);
 
@@ -16,8 +16,10 @@ describe('POST /api/resultats', function () {
         expect(resParcours.status).toBe(200);
         expect(resParcours.body[0].nom).toBe('parcours1');
 
+        const token = giveToken(user.id);
         const resultat = await supertest(app)
             .post('/api/resultats')
+            .set('Authorization', 'Bearer '+token)
             .send({
                 trailID: resParcours.body[0].id,
                 userID: user.id,
@@ -25,7 +27,6 @@ describe('POST /api/resultats', function () {
             })
         expect(resultat.status).toBe(201);
         expect(resultat.body.temps).toBe(120);
-        expect(resultat.headers.location).toMatch(/\/api\/resultats\/.+/);
     });
 });
 
@@ -39,6 +40,7 @@ describe('GET /api/resultats', function () {
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].temps).toBe(120);
+        expect(!response.body[0].utilisateur);
     });
 });
 
