@@ -55,20 +55,20 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
   query.exec()
   .then(parcours => {
     if (include?.includes("postes")) {
-      res.status(200).send(parcours => {
-        return {
+      res.status(200).send(
+        {
           id: parcours._id,
           nom: parcours.nom,
           postesInclus: parcours.postesInclus,
         }
-      })
+      )
     }
-    res.status(200).send(parcours => {
-      return {
+    res.status(200).send(
+      {
         id: parcours._id,
         nom: parcours.nom,
       }
-    })
+    )
   })
   .catch(next);
 });

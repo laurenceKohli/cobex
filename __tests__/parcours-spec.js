@@ -88,7 +88,7 @@ describe('GET /api/parcours/:id', function () {
 
          //valid id
         const response = await supertest(app)
-            .get('/api/parcours'+ parcours.id)
+            .get('/api/parcours/'+ parcours.id)
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
         expect(response.body.id).toBe(parcours.id);
@@ -106,11 +106,11 @@ describe('GET /api/parcours/:id WITH BODY', function () {
          const parcours = await createParcours();
 
         const response = await supertest(app)
-            .get('/api/parcours'+ parcours.id)
-            .send({include : 'postes'})
+            .get('/api/parcours/'+ parcours.id + "?include=postes")
+            // .send({include : 'postes'})
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
-        expect(response.body.postesInclus).toBe(parcours.postesInclus);
+        expect(JSON.stringify(response.body.postesInclus)).toBe(JSON.stringify(parcours.postesInclus));
     });
 });
 
