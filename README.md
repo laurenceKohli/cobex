@@ -12,8 +12,6 @@ Cette application permettra de participer à des courses d'orientation fixes dan
 - validation des postes parcourus
 
 ## A faire
-- Route GET utilisateurs/:id
--- si l'id n'est pas un id valid, alors 404 et non 200 (voir test response3)
 
 - Route GET parcours
 -- avec nomCreateur ne marche pas encore

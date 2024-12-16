@@ -55,7 +55,7 @@ describe('GET /api/utilisateurs/:id', function() {
         // id qui n'en est pas un
         const response3 = await supertest(app)
             .get('/api/utilisateurs/675')
-        expect(response3.status).toBe(404);
+        expect(response3.status).toBe(400);
 
     });
 });
