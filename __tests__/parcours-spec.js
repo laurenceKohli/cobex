@@ -1,7 +1,9 @@
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
-import { cleanUpDatabase, create2Postes, createParcours, createUser, createAdminUser } from './utils.js';
+import { cleanUpDatabase, create2Postes, createParcours, createUser, createAdminUser, giveToken } from './utils.js';
+
+import Parcours from "../models/parcours.js";
 
 beforeEach(cleanUpDatabase);
 
@@ -10,29 +12,20 @@ describe('POST /api/parcours', function () {
         // Create 2 posts in the database before test in this block.
         const [poste1, poste2] = await create2Postes();
 
-        const resPostes = await supertest(app).get('/api/postes')
-        // Check that the status and headers of the response are correct.
-        expect(resPostes.status).toBe(200);
-        expect(resPostes.get('Content-Type')).toContain('application/json');
-
         // Create a user in the database before test in this block.
-        const user = await createUser();
+        const user = await createAdminUser();
 
-        const resUser = await supertest(app).get('/api/utilisateurs')
-        // Check that the status and headers of the response are correct.
-        expect(resUser.status).toBe(200);
-        expect(resUser.get('Content-Type')).toContain('application/json');
-
+        const token = giveToken(user.id);
         // autoriser
         const parcours = await supertest(app)
             .post('/api/parcours')
+            .set('Authorization', 'Bearer '+token)
             .send({
                 nom: 'parcours1',
                 difficulte: 'facile',
                 createBy: user.id,
                 postesInclus: [poste1.id, poste2.id],
-                descr : 'test',
-                currentUserRole : user.role
+                descr : 'test'
             })
         expect(parcours.status).toBe(201);
         expect(parcours.body.nom).toBe('parcours1');
@@ -40,15 +33,17 @@ describe('POST /api/parcours', function () {
         expect(parcours.headers.location).toMatch(/\/api\/parcours\/.+/);
 
         //interdire
+        const user2 = await createUser();
+        const token2 = giveToken(user2.id);
         const parcours2 = await supertest(app)
             .post('/api/parcours')
+            .set('Authorization', 'Bearer '+token2)
             .send({
                 nom: 'parcours2',
                 difficulte: 'facile',
-                createBy: user.id,
+                createBy: user2.id,
                 postesInclus: [poste1.id, poste2.id],
-                descr : 'test',
-                currentUserRole : 'user'
+                descr : 'test'
             })
             expect(parcours2.status).toBe(403);
     });
@@ -66,6 +61,7 @@ describe('GET /api/parcours', function () {
         expect(response.body.length).toBe(1);
         expect(response.body[0].nbr_posts).toBe(2);
         expect(response.body[0].nom).toBe('parcours1');
+        expect(!response.body[0].nomCreateur);
     });
 });
 
@@ -76,12 +72,12 @@ describe('GET /api/parcours with BODY', function () {
 
         const response = await supertest(app)
             .get('/api/parcours')
-            .send({include : 'user'})
+            .send({query : {include : 'user'}})
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].nbr_posts).toBe(2);
         expect(response.body[0].nom).toBe('parcours1');
-        expect(response.body[0].createBy.nom).toBe('Jane Doe');
+        expect(response.body[0].nomCreateur).toBe('Jane Doe');
     });
 });
 
@@ -92,7 +88,7 @@ describe('GET /api/parcours/:id', function () {
 
          //valid id
         const response = await supertest(app)
-            .get('/api/parcours'+ parcours.id)
+            .get('/api/parcours/'+ parcours.id)
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
         expect(response.body.id).toBe(parcours.id);
@@ -110,11 +106,11 @@ describe('GET /api/parcours/:id WITH BODY', function () {
          const parcours = await createParcours();
 
         const response = await supertest(app)
-            .get('/api/parcours'+ parcours.id)
-            .send({include : 'postes'})
+            .get('/api/parcours/'+ parcours.id + "?include=postes")
+            // .send({include : 'postes'})
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
-        expect(response.body.postesInclus).toBe(parcours.postesInclus);
+        expect(JSON.stringify(response.body.postesInclus)).toBe(JSON.stringify(parcours.postesInclus));
     });
 });
 
@@ -123,18 +119,15 @@ describe('DELETE /api/parcours/:id', function () {
          // Create a parcours in the database before test in this block.
          const parcours = await createParcours();
 
+         const token = giveToken(parcours.createBy);
+
         const response = await supertest(app)
             .delete('/api/parcours'+ parcours.id)
-            .send({currentUserRole : 'superAdmin'})
+            .set('Authorization', 'Bearer '+token)
         expect(response.status).toBe(200);
         //TODO si retourne qqch alors le controler
 
         expect(await Parcours.findById(parcours.id)).toBe(null);
-
-        // const response2 = await supertest(app)
-        //     .get('/api/parcours')
-        // expect(response2.status).toBe(200);
-        // expect(response2.body.length).toBe(0);
     });
 });
 

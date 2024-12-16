@@ -2,6 +2,12 @@ import Utilisateur from '../models/utilisateur.js';
 import Poste from '../models/poste.js';
 import Parcours from '../models/parcours.js';
 import Resultat from '../models/resultat.js';
+import jwt from "jsonwebtoken";
+
+import { promisify } from "util";
+import * as config from '../config.js';
+const signJwt = promisify(jwt.sign);
+
 
 export async function cleanUpDatabase() {
   await Promise.all([
@@ -12,12 +18,20 @@ export async function cleanUpDatabase() {
   ]);
 }
 
+export function giveToken(userID){
+  // return signJwt({ sub: userID, exp: '1h' }, config.secret)
+  const exp = Math.floor(Date.now() / 1000) + 7 * 24 * 3600;
+    const payload = { sub: userID, exp: exp};
+
+    return jwt.sign(payload, config.secret);
+}
+
 export function createUser(){
     return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym' });
 }
 
 export function createAdminUser(){
-  return Utilisateur.create({ nom: 'Jane Doe', mail: 'test@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym', role: 'admin' });
+  return Utilisateur.create({ nom: 'John Doe', mail: 'test2@test.com', mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym', role: 'admin' });
 }
 
 export function createPoste(){

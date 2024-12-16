@@ -15,7 +15,8 @@ describe('POST /api/utilisateurs', function() {
                 mdp: 'password'
             })
         expect(response.status).toBe(201);
-        expect(response.body.nom).toBe('John Doe');
+        expect(response.body.savedPerson.nom).toBe('John Doe');
+        expect(typeof response.body.token).toBe('string');
         expect(response.headers.location).toMatch(/\/api\/utilisateurs\/.+/);
     });
 });
@@ -35,18 +36,29 @@ describe('GET /api/utilisateurs', function() {
     });
 });
 
-// describe('GET /api/utilisateurs/:id', function() {
-//     it('should retrieve one user', async function() {        
-//         // Create a user in the database before test in this block.
-//         const user = await createUser();
+describe('GET /api/utilisateurs/:id', function() {
+    it('should retrieve one user name', async function() {        
+        // Create a user in the database before test in this block.
+        const user = await createUser();
 
-//         const response = await supertest(app)
-//             .get('/api/utilisateurs/' + user.id)
-//         expect(response.status).toBe(200);
-//         expect(response.body.nom).toBe('Jane Doe');
-//         expect(!response.body.mdp);
-//     });
-// });
+        const response = await supertest(app)
+            .get('/api/utilisateurs/' + user.id)
+        expect(response.status).toBe(200);
+        expect(response.body.nom).toBe('Jane Doe');
+        expect(!response.body.mdp);
+
+        //test 404
+        const response2 = await supertest(app)
+            .get('/api/utilisateurs/675acf94c22b546fcde7794d')
+        expect(response2.status).toBe(404);
+
+        // id qui n'en est pas un
+        const response3 = await supertest(app)
+            .get('/api/utilisateurs/675')
+        expect(response3.status).toBe(404);
+
+    });
+});
 //TODO tester aussi que si on a pas le ID c'est erreur 404 quand test ID
 
 describe('POST /api/utilisateurs/login', function() {
