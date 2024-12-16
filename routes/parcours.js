@@ -54,6 +54,9 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
   const query = Parcours.findById(req.params.id)
   query.exec()
   .then(parcours => {
+    if (parcours === null) {
+      return res.status(404).send("Parcours not found");
+    }
     if (include?.includes("postes")) {
       res.status(200).send(
         {
