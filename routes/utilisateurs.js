@@ -68,6 +68,9 @@ router.post("/", utils.requireJson, function (req, res, next) {
     req.body.role = "utilisateur";
     const nouvelUtilisateur = new Utilisateur(req.body);
     return nouvelUtilisateur.save()
+    .catch(err => {
+      res.status(400).send({msg: err.message});
+    });
   })
   .then(savedPerson => {
     const exp = Math.floor((Date.now() / 1000) + 60 * 60 * 24);
