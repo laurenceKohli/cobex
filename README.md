@@ -14,7 +14,7 @@ Cette application permettra de participer à des courses d'orientation fixes dan
 ## A faire
 
 - Route GET parcours
--- avec nomCreateur ne marche pas encore
+- avec nomCreateur ne marche pas encore
 - Route GET :id ne fonctionne pas
 - Route GET :id avec postes ne fonctionne pas
 - Route DELETE parcours : erreur 404

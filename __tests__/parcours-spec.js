@@ -71,13 +71,12 @@ describe('GET /api/parcours with BODY', function () {
          const parcours = await createParcours();
 
         const response = await supertest(app)
-            .get('/api/parcours')
-            .send({query : {include : 'user'}})
+            .get('/api/parcours?include=user');
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].nbr_posts).toBe(2);
         expect(response.body[0].nom).toBe('parcours1');
-        expect(response.body[0].nomCreateur).toBe('Jane Doe');
+        expect(response.body[0].nomCreateur).toBe('John Doe');
     });
 });
 
