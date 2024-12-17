@@ -10,9 +10,3 @@ Cette application permettra de participer à des courses d'orientation fixes dan
 - vérification de la position du QR-code et de l'utilisateur
 - chronométrage
 - validation des postes parcourus
-
-## A faire
-
-- Route GET parcours
-- Route GET :id avec postes ne fonctionne pas
-- Route DELETE parcours : erreur 404

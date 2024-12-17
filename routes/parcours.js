@@ -6,7 +6,6 @@ import * as utils from "./utils.js";
 import Parcours from "../models/parcours.js";
 import Utilisateur from "../models/utilisateur.js";
 import { Authorise } from "./auth.js";
-import parcours from "../models/parcours.js";
 
 const router = express.Router();
 
@@ -132,16 +131,22 @@ router.patch("/:id", utils.requireJson, Authorise(true), function (req, res, nex
 });
 
 router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next) {
-  Parcours.findById(req.params.id).exec()
+  Parcours.findById(req.params.id).populate("createBy").exec()
   .then(chemin => {
-    if (req.currentUserRole !== "superAdmin" && chemin.createBy !== req.currentUser) {
+    if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser)) {
+      console.log(chemin.createBy)
+      console.log(req.currentUser)
       return res.status(403).send("Forbidden");
-    } else {
-      return chemin.remove()
-      .then(() => {
-        res.status(204).send();
-      })
     }
+    //else
+    Parcours.findByIdAndDelete(req.params.id).exec()
+    .then((parcours) => {
+      if (parcours){
+        return res.status(204).send();
+      }
+      return res.status(404).send("Parcours not found");
+    })
+    
   })
   .catch(next);
 })

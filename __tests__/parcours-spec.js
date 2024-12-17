@@ -121,9 +121,9 @@ describe('DELETE /api/parcours/:id', function () {
          const token = giveToken(parcours.createBy);
 
         const response = await supertest(app)
-            .delete('/api/parcours'+ parcours.id)
+            .delete('/api/parcours/'+ parcours.id)
             .set('Authorization', 'Bearer '+token)
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(204);
         //TODO si retourne qqch alors le controler
 
         expect(await Parcours.findById(parcours.id)).toBe(null);
