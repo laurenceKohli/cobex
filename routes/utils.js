@@ -4,7 +4,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 function VerifyID(req, res, next) {
   if (!ObjectId.isValid(req.params.id)) {
-    res.send("Invalid ID");
+    res.status(400).send("Invalid ID");
   }else{
     next();
   }

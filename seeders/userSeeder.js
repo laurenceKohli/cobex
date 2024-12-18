@@ -12,6 +12,11 @@ export function seedUser() {
             nom: 'John Doe',
             mail: 'john@example.com',
             mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym',
+        },
+        {
+            nom: 'Tommy Doe',
+            mail: 'tommy@example.com',
+            mdp: '$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym',
         }
     ];
 

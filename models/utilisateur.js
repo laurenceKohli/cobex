@@ -15,10 +15,10 @@ const utilisateurSchema = new Schema({
             [
                 {
                     validator: validatePersonNameUniqueness,
-                    message: 'Person {VALUE} already exists'
+                    message: 'Person {VALUE} already exists §§usernameExists§§'
                 }
             ]
-    },
+    },  
     mail: {
         type: String,
         required: true,
@@ -29,11 +29,11 @@ const utilisateurSchema = new Schema({
             [
                 {
                     validator: validatePersonMailUniqueness,
-                    message: 'Person {VALUE} already exists'
+                    message: 'Mail {VALUE} already exists §§emailExists§§'
                 },
                 {
                     validator: validateIsMail,
-                    message: '{VALUE} is not a valid mail'
+                    message: '{VALUE} is not a valid mail §§invalidEmail§§'
                 }
             ]
     },

@@ -1,7 +1,7 @@
 import supertest from "supertest"
 import app from "../app.js"
 import mongoose from "mongoose"
-import { cleanUpDatabase, create2Postes, createParcours, createUser, createAdminUser, giveToken } from './utils.js';
+import { cleanUpDatabase, create2Postes, createParcours, createUser, createAdminUser, giveToken, createParcoursWithResult } from './utils.js';
 
 import Parcours from "../models/parcours.js";
 
@@ -71,13 +71,12 @@ describe('GET /api/parcours with BODY', function () {
          const parcours = await createParcours();
 
         const response = await supertest(app)
-            .get('/api/parcours')
-            .send({query : {include : 'user'}})
+            .get('/api/parcours?include=user');
         expect(response.status).toBe(200);
         expect(response.body.length).toBe(1);
         expect(response.body[0].nbr_posts).toBe(2);
         expect(response.body[0].nom).toBe('parcours1');
-        expect(response.body[0].nomCreateur).toBe('Jane Doe');
+        expect(response.body[0].nomCreateur).toBe('John Doe');
     });
 });
 
@@ -103,14 +102,17 @@ describe('GET /api/parcours/:id', function () {
 describe('GET /api/parcours/:id WITH BODY', function () {
     it('should retrieve one parcours with postes', async function () { 
          // Create a parcours in the database before test in this block.
-         const parcours = await createParcours();
+         const parcours = await createParcoursWithResult();
 
         const response = await supertest(app)
             .get('/api/parcours/'+ parcours.id + "?include=postes")
-            // .send({include : 'postes'})
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
+        expect(response.body.descr).toBe(undefined);
         expect(JSON.stringify(response.body.postesInclus)).toBe(JSON.stringify(parcours.postesInclus));
+        expect(response.body.resultatsAct.length).toBe(1);
+        expect(response.body.resultatsAct[0].temps).toBe(120);
+        expect(response.body.resultatsAct[0].user).toBe('Jane Doe');
     });
 });
 
@@ -122,9 +124,9 @@ describe('DELETE /api/parcours/:id', function () {
          const token = giveToken(parcours.createBy);
 
         const response = await supertest(app)
-            .delete('/api/parcours'+ parcours.id)
+            .delete('/api/parcours/'+ parcours.id)
             .set('Authorization', 'Bearer '+token)
-        expect(response.status).toBe(200);
+        expect(response.status).toBe(204);
         //TODO si retourne qqch alors le controler
 
         expect(await Parcours.findById(parcours.id)).toBe(null);

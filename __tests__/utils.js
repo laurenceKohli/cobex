@@ -81,6 +81,11 @@ export async function createParcours(userId){
 });
 }
 
+export async function createParcoursWithResult(){
+  const resultat = await createResultat();
+  return Parcours.findById(resultat.trailID);
+ }
+
 export async function createResultat(){
   const user = await createUser();
   const parcours = await createParcours(user.id);

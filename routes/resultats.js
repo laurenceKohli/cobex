@@ -42,7 +42,10 @@ router.get("/", function (req, res, next) {
           id: resultat._id,
           temps: resultat.temps,
           utilisateur: resultat.userID.nom,
-          parcours: resultat.trailID,
+          parcours: {
+            id: resultat.trailID._id,
+            nom : resultat.trailID.nom,
+          }
         };
       }
       //else
@@ -55,7 +58,10 @@ router.get("/", function (req, res, next) {
       return {
         id: resultat._id,
         temps: resultat.temps,
-        parcours: resultat.trailID,
+        parcours: {
+          id: resultat.trailID._id,
+          nom : resultat.trailID.nom,
+        }
       };
     }
     //else

@@ -68,6 +68,9 @@ router.post("/", utils.requireJson, function (req, res, next) {
     req.body.role = "utilisateur";
     const nouvelUtilisateur = new Utilisateur(req.body);
     return nouvelUtilisateur.save()
+    .catch(err => {
+      res.status(400).send({msg: err.message});
+    });
   })
   .then(savedPerson => {
     const exp = Math.floor((Date.now() / 1000) + 60 * 60 * 24);
@@ -92,7 +95,7 @@ router.post("/login", function (req, res, next) {
         // Login is valid...
         const exp = Math.floor((Date.now() / 1000) + 60 * 60 * 24);
         return signJwt({ sub: utilisateur._id, exp: exp }, config.secret).then(token => {
-          res.send({ message: `Welcome ${utilisateur.nom}!`, token });
+          res.send({ message: `Welcome ${utilisateur.nom}!`, token, utilisateur });
         });
       });
     })
