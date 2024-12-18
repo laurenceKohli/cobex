@@ -71,6 +71,11 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
         temps: 1,
         user: '$user.nom'
       }
+    },
+    {
+      $sort: {
+        temps: 1 // Trier par temps du plus petit au plus grand
+      }
     }
   );
 

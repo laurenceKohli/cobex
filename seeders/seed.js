@@ -18,7 +18,7 @@ function seed() {
     })
     .then(({ users, parcours }) => {
       const parcoursID = parcours.map(parcour => parcour._id);
-      return seedResultats(users[1]._id, parcoursID);
+      return seedResultats(users, parcoursID);
     })
     .then(() => {
       console.log('Seeding completed successfully.');
