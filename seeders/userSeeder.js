@@ -1,7 +1,16 @@
 import Utilisateur from '../models/utilisateur.js';
+import bcrypt from "bcrypt";
+import * as config from '../config.js';
 
-export function seedUser() {
+export async function seedUser() {
+    const mdpMary = await bcrypt.hash( ('superAdminMary'), config.bcryptCostFactor)
     const users = [
+        {
+            nom: 'Mary Doe',
+            mail: 'mary.doe@example.com',
+            mdp: mdpMary,
+            role: 'superAdmin'
+        },
         {
             nom: 'Jane Doe',
             mail: 'jane.doe@example.com',

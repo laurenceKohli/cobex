@@ -16,25 +16,25 @@
   "tags": [
     {
       "name": "utilisateurs",
-      "description": "Opérations à propos des utilisateurs."
+      "description": "Opérations à propos des utilisateurs"
     },
     {
       "name": "postes",
-      "description": "Opérations à propos des postes."
+      "description": "Opérations à propos des postes"
     },
     {
       "name": "parcours",
-      "description": "Opérations à propos des parcours."
+      "description": "Opérations à propos des parcours"
     },
     {
       "name": "resultats",
-      "description": "Opérations à propos des résultats."
+      "description": "Opérations à propos des résultats"
     }
   ],
   "paths": {
     "/utilisateurs": {
       "post": {
-        "summary": "Créer un nouvel utilisateur.",
+        "summary": "Créer un nouvel utilisateur",
         "tags": [
           "utilisateurs"
         ],
@@ -49,7 +49,7 @@
         },
         "responses": {
           "201": {
-            "description": "Utilisateur créé avec succès.",
+            "description": "Utilisateur créé avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -64,7 +64,7 @@
         }
       },
       "get": {
-        "summary": "Récupérer la liste des utilisateurs.",
+        "summary": "Récupérer la liste des utilisateurs",
         "tags": [
           "utilisateurs"
         ],
@@ -72,7 +72,7 @@
           {
             "name": "include",
             "in": "query",
-            "description": "Inclure le role des utilisateurs dans la réponse.",
+            "description": "Inclure le role des utilisateurs dans la réponse",
             "required": false,
             "schema": {
               "type": "string",
@@ -85,7 +85,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Liste des utilisateurs récupérée avec succès.",
+            "description": "Liste des utilisateurs récupérée avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -108,7 +108,7 @@
     },
     "/utilisateurs/{id}": {
       "get": {
-        "summary": "Récupérer un utilisateur par ID.",
+        "summary": "Récupérer un utilisateur par son ID",
         "tags": [
           "utilisateurs"
         ],
@@ -120,12 +120,12 @@
             "schema": {
               "type": "string"
             },
-            "description": "ID de l'utilisateur à récupérer."
+            "description": "ID de l'utilisateur à récupérer"
           }
         ],
         "responses": {
           "200": {
-            "description": "Utilisateur récupéré avec succès.",
+            "description": "Utilisateur récupéré avec succès",
             "content": {
               "application/json": {
                 "schema": {
@@ -142,7 +142,7 @@
     },
     "/utilisateurs/login": {
       "post": {
-        "summary": "Connexion d'un utilisateur.",
+        "summary": "Connexion d'un utilisateur",
         "tags": [
           "utilisateurs"
         ],
@@ -157,7 +157,7 @@
         },
         "responses": {
           "200": {
-            "description": "Connexion réussie.",
+            "description": "Connexion réussie",
             "content": {
               "application/json": {
                 "schema": {
@@ -171,12 +171,122 @@
           }
         }
       }
+    },
+    "/postes": {
+      "get": {
+        "summary": "Récupérer la liste des postes",
+        "tags": [
+          "postes"
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des postes récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PosteData"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/postes/{id}": {
+      "get": {
+        "summary": "Récupérer un poste par son ID",
+        "tags": [
+          "postes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du poste à récupérer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poste récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartialPosteData"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifier l'accès à un poste",
+        "tags": [
+          "postes"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID du poste à récupérer"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+                "description": "Indique si le poste est accessible actuellement",
+                "example": "estAccessible: false"
+              }
+            }
+          },
+        "responses": {
+          "200": {
+            "description": "Poste modifié avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poste"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Aucune donnée à modifier",
+            "content":{
+            "text/html": {
+              "example": "No data to update"
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
     }
   },
   "components": {
     "responses": {
       "PersonValidationError": {
-        "description": "The person is invalid.",
+        "description": "The person is invalid",
         "content": {
           "application/json": {
             "example": {
@@ -194,7 +304,7 @@
         }
       },
       "Unauthorized": {
-        "description": "Non autorisé.",
+        "description": "Non autorisé",
         "content": {
           "text/html": {
             "example": {
@@ -204,10 +314,17 @@
         }
       },
       "Forbidden": {
-        "description": "Interdit."
+        "description": "Interdit",
+        "content": {
+          "text/html": {
+            "example": {
+              "message": "Forbidden"
+            }
+          }
+        }
       },
       "NotFound": {
-        "description": "Non trouvé.",
+        "description": "Non trouvé",
         "content": {
           "text/html": {
             "example": {
@@ -366,7 +483,6 @@
           }
         }
       },
-      
       "LoginData": {
         "type": "object",
         "properties": {
@@ -377,7 +493,10 @@
             "type": "string"
           }
         },
-        "required": ["nom", "mdp"]
+        "required": [
+          "nom",
+          "mdp"
+        ]
       },
       "LoginResponse": {
         "type": "object",
@@ -442,7 +561,7 @@
           "descr": {
             "type": "string",
             "description": "Descritpion du poste",
-            "example": "A gauche de ce poste se trouve l'arbre cententaire..."
+            "example": "A gauche de ce poste se trouve l'arbre cententaire.."
           },
           "createdAt": {
             "type": "string",
@@ -459,12 +578,51 @@
           "createdAt"
         ]
       },
+      "PosteData": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du poste",
+            "example": "d038e6fedc4cf8b5ace5a689"
+          },
+          "number": {
+            "type": "integer",
+            "description": "Le numéro de poste tel que inscrit sur la carte globale",
+            "minimum": 30,
+            "exclusiveMinimum": true,
+            "example": "37"
+          },
+          "geoloc": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "integer",
+                "description": "Latitude du poste",
+                "example": "567 462"
+              },
+              "long": {
+                "type": "integer",
+                "description": "Longitude du poste",
+                "example": "123 440"
+              }
+            },
+            "description": "Coordonnées du poste"
+          }
+        }
+      },
       "PartialPosteData": {
         "properties": {
           "id": {
             "type": "string",
             "description": "Identifiant unique du poste",
             "example": "d038e6fedc4cf8b5ace5a689"
+          },
+          "number": {
+            "type": "integer",
+            "description": "Le numéro de poste tel que inscrit sur la carte globale",
+            "minimum": 30,
+            "exclusiveMinimum": true,
+            "example": "37"
           },
           "geoloc": {
             "type": "object",
