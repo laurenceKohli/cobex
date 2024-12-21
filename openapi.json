@@ -7,6 +7,9 @@
   },
   "servers": [
     {
+      "url": "https://cobex-uu6t.onrender.com/api"
+    },
+    {
       "url": "http://localhost:3000/api"
     }
   ],
@@ -14,6 +17,18 @@
     {
       "name": "utilisateurs",
       "description": "Opérations à propos des utilisateurs."
+    },
+    {
+      "name": "postes",
+      "description": "Opérations à propos des postes."
+    },
+    {
+      "name": "parcours",
+      "description": "Opérations à propos des parcours."
+    },
+    {
+      "name": "resultats",
+      "description": "Opérations à propos des résultats."
     }
   ],
   "paths": {
@@ -38,17 +53,348 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Person"
+                  "$ref": "#/components/schemas/PersonWithToken"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/PersonValidationError"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer la liste des utilisateurs.",
+        "tags": [
+          "utilisateurs"
+        ],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Inclure le role des utilisateurs dans la réponse.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "role"
+              ],
+              "example": "role"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs récupérée avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartialPersonData"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/utilisateurs/{id}": {
+      "get": {
+        "summary": "Récupérer un utilisateur par ID.",
+        "tags": [
+          "utilisateurs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID de l'utilisateur à récupérer."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur récupéré avec succès.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartialPersonData"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/utilisateurs/login": {
+      "post": {
+        "summary": "Connexion d'un utilisateur.",
+        "tags": [
+          "utilisateurs"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       }
     }
   },
   "components": {
+    "responses": {
+      "PersonValidationError": {
+        "description": "The person is invalid.",
+        "content": {
+          "application/json": {
+            "example": {
+              "msg": "Utilisateur validation failed : nom: Person Max already exists §§usernameExists§§",
+              "errors": {
+                "nom": {
+                  "kind": "String",
+                  "message": "Person `Max` already exists §§usernameExists§§",
+                  "name": "validatePersonNameUniqueness",
+                  "value": "Max"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Non autorisé.",
+        "content": {
+          "text/html": {
+            "example": {
+              "message": "Unauthorized"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Interdit."
+      },
+      "NotFound": {
+        "description": "Non trouvé.",
+        "content": {
+          "text/html": {
+            "example": {
+              "message": "Not Found"
+            }
+          }
+        }
+      }
+    },
     "schemas": {
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Nom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "mail",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          },
+          "role": {
+            "type": "string",
+            "description": "Rôle de l'utilisateur",
+            "enum": [
+              "utilisateur",
+              "admin",
+              "superAdmin"
+            ],
+            "example": "utilisateur"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création de l'utilisateur",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "nom",
+          "mail",
+          "mdp",
+          "estAdmin",
+          "createdAt"
+        ]
+      },
+      "PersonData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          },
+          "mail": {
+            "type": "string",
+            "description": "Mail de l'utilisateur",
+            "example": "example@example.com",
+            "format": "email"
+          },
+          "mdp": {
+            "type": "string",
+            "description": "Mot de passe de l'utilisateur",
+            "example": "SuperMotDePasse",
+            "format": "password"
+          }
+        },
+        "required": [
+          "nom",
+          "mail",
+          "mdp"
+        ]
+      },
+      "PartialPersonData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de l'utilisateur",
+            "example": "7038e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Prénom de l'utilisateur",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "John"
+          }
+        }
+      },
+      "PersonWithToken": {
+        "type": "object",
+        "properties": {
+          "savedPerson": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifiant unique de l'utilisateur",
+                "example": "7038e6fedc4cf8b5ace5a689"
+              },
+              "nom": {
+                "type": "string",
+                "description": "Nom de l'utilisateur",
+                "minLength": 3,
+                "maxLength": 30,
+                "example": "John"
+              },
+              "mail": {
+                "type": "mail",
+                "description": "Mail de l'utilisateur",
+                "example": "example@example.com",
+                "format": "email"
+              },
+              "role": {
+                "type": "string",
+                "description": "Rôle de l'utilisateur",
+                "enum": [
+                  "utilisateur",
+                  "admin",
+                  "superAdmin"
+                ],
+                "example": "utilisateur"
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "Date de création de l'utilisateur",
+                "format": "date-time",
+                "example": "2022-01-01T00:00:00Z"
+              }
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "Token d'authentification",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzY2N2FlMjQ4NjFhMzFiYmIzMmU1MjAiLCJleHAiOjE3MzQ4NTU3NzgsImlhdCI6MTczNDc2OTM3OH0.NcxYZbhJwwYRUr0H9g780gKyvvspt85GOTiwRb7luP8"
+          }
+        }
+      },
+      
+      "LoginData": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string"
+          },
+          "mdp": {
+            "type": "string"
+          }
+        },
+        "required": ["nom", "mdp"]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bienvenue John!"
+          },
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzY2N2FlMjQ4NjFhMzFiYmIzMmU1MjAiLCJleHAiOjE3MzQ4NTU3NzgsImlhdCI6MTczNDc2OTM3OH0.NcxYZbhJwwYRUr0H9g780gKyvvspt85GOTiwRb7luP8"
+          },
+          "utilisateur": {
+            "$ref": "#/components/schemas/Person"
+          }
+        }
+      },
       "Poste": {
         "type": "object",
         "properties": {
@@ -114,45 +460,47 @@
         ]
       },
       "PartialPosteData": {
-        "properties": {"id": {
-          "type": "string",
-          "description": "Identifiant unique du poste",
-          "example": "d038e6fedc4cf8b5ace5a689"
-        },
-        "geoloc": {
-          "type": "object",
-          "properties": {
-            "lat": {
-              "type": "integer",
-              "description": "Latitude du poste",
-              "example": "567 462"
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du poste",
+            "example": "d038e6fedc4cf8b5ace5a689"
+          },
+          "geoloc": {
+            "type": "object",
+            "properties": {
+              "lat": {
+                "type": "integer",
+                "description": "Latitude du poste",
+                "example": "567 462"
+              },
+              "long": {
+                "type": "integer",
+                "description": "Longitude du poste",
+                "example": "123 440"
+              }
             },
-            "long": {
-              "type": "integer",
-              "description": "Longitude du poste",
-              "example": "123 440"
+            "description": "Coordonnées du poste"
+          },
+          "estAccessible": {
+            "type": "boolean",
+            "description": "Indique si le poste est accessible actuellement",
+            "example": true
+          },
+          "images": {
+            "type": "array",
+            "description": "Toutes les images qui sont liées au poste",
+            "items": {
+              "type": "string",
+              "format": "url"
             }
           },
-          "description": "Coordonnées du poste"
-        },
-        "estAccessible": {
-          "type": "boolean",
-          "description": "Indique si le poste est accessible actuellement",
-          "example": true
-        },
-        "images": {
-          "type": "array",
-          "description": "Toutes les images qui sont liées au poste",
-          "items": {
+          "descr": {
             "type": "string",
-            "format": "url"
+            "description": "Descritpion du poste",
+            "example": "A gauche de ce poste se trouve l'arbre cententaire..."
           }
-        },
-        "descr": {
-          "type": "string",
-          "description": "Descritpion du poste",
-          "example": "A gauche de ce poste se trouve l'arbre cententaire..."
-        }}
+        }
       },
       "Resultat": {
         "type": "object",
@@ -361,105 +709,6 @@
               "type": "string"
             },
             "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
-          }
-        }
-      },
-      "Person": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique de l'utilisateur",
-            "example": "7038e6fedc4cf8b5ace5a689"
-          },
-          "nom": {
-            "type": "string",
-            "description": "Prénom de l'utilisateur",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "John"
-          },
-          "mail": {
-            "type": "mail",
-            "description": "Mail de l'utilisateur",
-            "example": "example@example.com",
-            "format": "email"
-          },
-          "mdp": {
-            "type": "string",
-            "description": "Mot de passe de l'utilisateur",
-            "example": "SuperMotDePasse",
-            "format": "password"
-          },
-          "role": {
-            "type": "string",
-            "description": "Rôle de l'utilisateur",
-            "enum": [
-              "utilisateur",
-              "admin",
-              "superAdmin"
-            ],
-            "example": "utilisateur"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Date de création de l'utilisateur",
-            "format": "date-time",
-            "example": "2022-01-01T00:00:00Z"
-          }
-        },
-        "required": [
-          "id",
-          "nom",
-          "mail",
-          "mdp",
-          "estAdmin",
-          "createdAt"
-        ]
-      },
-      "PersonData": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "description": "Prénom de l'utilisateur",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "John"
-          },
-          "mail": {
-            "type": "string",
-            "description": "Mail de l'utilisateur",
-            "example": "example@example.com",
-            "format": "email"
-          },
-          "mdp": {
-            "type": "string",
-            "description": "Mot de passe de l'utilisateur",
-            "example": "SuperMotDePasse",
-            "format": "password"
-          }
-        },
-        "required": [
-          "nom",
-          "mail",
-          "mdp"
-        ]
-      },
-      "PartialPersonData": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique de l'utilisateur",
-            "example": "7038e6fedc4cf8b5ace5a689"
-          },
-          "nom": {
-            "type": "string",
-            "description": "Prénom de l'utilisateur",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "John"
           }
         }
       }

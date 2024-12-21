@@ -26,7 +26,7 @@ Delete -> si parcours est supprimer
 # REST
 ## utilisateurs.js
 GET /api/utilisateurs -> uniquement nom et id
-GET /api/utilisateurs?include=isAdmin -> affichable que par le Superadmin
+GET /api/utilisateurs?include=role -> affichable que par le Superadmin
 GET /api/utilisateurs/:id
 
 POST /api/utilisateurs
