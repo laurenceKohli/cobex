@@ -137,7 +137,7 @@ router.post("/", utils.requireJson, Authorise(true), function (req, res, next) {
 router.put("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function (req, res, next) {
   Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && chemin.createBy !== req.currentUser) {
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
         return res.status(403).send("Forbidden");
       } else {
         chemin.nom = req.body.nom;
@@ -153,11 +153,11 @@ router.put("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function 
     .catch(next);
 });
 
-router.patch("/:id", utils.requireJson, Authorise(true), function (req, res, next) {
+router.patch("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function (req, res, next) {
   Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && chemin.createBy !== req.currentUser) {
-        return res.status(403).send("Forbidden");
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
+        return res.status(403).send("Forbidden" + chemin.createBy + req.currentUser);
       } else {
         if (req.body.nom) chemin.nom = req.body.nom;
         if (req.body.difficulte) chemin.difficulte = req.body.difficulte;
@@ -176,8 +176,6 @@ router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next)
   Parcours.findById(req.params.id).populate("createBy").exec()
     .then(chemin => {
       if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser)) {
-        console.log(chemin.createBy)
-        console.log(req.currentUser)
         return res.status(403).send("Forbidden");
       }
       //else

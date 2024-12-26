@@ -116,18 +116,59 @@ describe('GET /api/parcours/:id WITH BODY', function () {
     });
 });
 
-describe('DELETE /api/parcours/:id', function () {
-    it('should delete the parcours', async function () { 
+describe('PATCH /api/parcours/:id', function () {
+    it('should update partially the parcours', async function () { 
          // Create a parcours in the database before test in this block.
          const parcours = await createParcours();
 
          const token = giveToken(parcours.createBy);
 
         const response = await supertest(app)
+            .patch('/api/parcours/'+ parcours.id)
+            .set('Authorization', 'Bearer '+token)
+            .send({
+                nom: 'Mon Parcours',
+                descr: 'test'
+            })
+        expect(response.status).toBe(200);
+        expect(response.body.nom).toBe('Mon Parcours');
+        expect(response.body.descr).toBe('test');
+        expect(response.body.difficulte).toBe('facile');
+
+        //interdire
+        const user2 = await createUser();
+        const token2 = giveToken(user2.id);
+        const response2 = await supertest(app)
+            .patch('/api/parcours/'+ parcours.id)
+            .set('Authorization', 'Bearer '+token2)
+            .send({
+                nom: 'Mon Parcours',
+                descr: 'test'
+            })
+        expect(response2.status).toBe(403);
+    });
+});
+
+describe('DELETE /api/parcours/:id', function () {
+    it('should delete the parcours', async function () { 
+         // Create a parcours in the database before test in this block.
+         const parcours = await createParcours();
+
+         //interdire
+         const user2 = await createUser();
+        const token = giveToken(user2.id);
+
+        const response = await supertest(app)
             .delete('/api/parcours/'+ parcours.id)
             .set('Authorization', 'Bearer '+token)
-        expect(response.status).toBe(204);
-        //TODO si retourne qqch alors le controler
+        expect(response.status).toBe(403);
+         //autoriser
+         const token2 = giveToken(parcours.createBy);
+
+        const response2 = await supertest(app)
+            .delete('/api/parcours/'+ parcours.id)
+            .set('Authorization', 'Bearer '+token2)
+        expect(response2.status).toBe(204);
 
         expect(await Parcours.findById(parcours.id)).toBe(null);
     });

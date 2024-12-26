@@ -74,7 +74,7 @@ describe('POST /api/utilisateurs/login', function() {
                 mdp: 'password'
             })
         expect(response1.status).toBe(200);
-        expect(response1.body.message).toBe('Welcome Jane Doe!');
+        expect(response1.body.message).toBe('Bienvenue Jane Doe!');
         expect(!response1.body.mdp);
 
         //invalid password
