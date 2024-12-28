@@ -17,7 +17,11 @@ router.get("/", function (req, res, next) {
       query = Resultat.find({userID : req.query.utilisateurs}, {trailID : req.query.parcours})
     }
   }else if (req.query.parcours){
-    query = Resultat.find({trailID : req.query.parcours})
+    if (!req.query.page || req.query.page <= 1){
+      return query = Resultat.find({trailID : req.query.parcours}).limit(4)
+    }
+    //else
+    query = Resultat.find({trailID : req.query.parcours}).skip(Math.floor(req.query.page - 1) * 4).limit(4)
   }
 
   let include = false;
