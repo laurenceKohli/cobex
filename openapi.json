@@ -528,6 +528,174 @@
           }
         }
       }
+    },
+    "/resultats": {
+      "post": {
+        "summary": "Créer un nouveau résultat",
+        "tags": ["resultats"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultatData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Résultat créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Resultat"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized" 
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer les résultats",
+        "tags": ["resultats"],
+        "parameters": [
+          {
+            "name": "utilisateurs",
+            "in": "query",
+            "description": "Filtrer par ID utilisateur",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parcours",
+            "in": "query", 
+            "description": "Filtrer par ID parcours",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de page (4 résultats par page)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Inclure des informations supplémentaires",
+            "schema": {
+              "type": "string",
+              "enum": ["utilisateurs", "parcours"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des résultats",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResultatPartialData"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resultats/{userId}": {
+      "patch": {
+        "summary": "Anonymiser les résultats d'un utilisateur, lors de la suppression de son compte",
+        "tags": ["resultats"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Résultats anonymisés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResultatAnonymized"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/resultats/{id}": {
+      "delete": {
+        "summary": "Supprimer un résultat, lors de la suppression du parcours",
+        "tags": ["resultats"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Résultat supprimé avec succès"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -947,6 +1115,39 @@
           "createdAt"
         ]
       },
+      "ResultatAnonymized": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du résultat",
+            "example": "6cf8e6fedc4cf8b5ace5a689"
+          },
+          "temps": {
+            "type": "integer",
+            "description": "Temps en secondes mis pour faire le parcours",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "example": "600"
+          },
+          "userID": {
+            "type": "string",
+            "description": "L'identifiant de anonyme",
+            "example": "7038e6fedc4cf8b5ace5a123"
+          },
+          "trailID": {
+            "type": "string",
+            "description": "L'identifiant unique du parcours finalisé",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Date de création du résultat",
+            "format": "date-time",
+            "example": "2022-01-01T00:00:00Z"
+          }
+        }
+      },
       "ResultatData": {
         "properties": {
           "temps": {
@@ -965,6 +1166,50 @@
             "type": "string",
             "description": "L'identifiant unique du parcours finalisé",
             "example": "00f8e6fedc4cf8b5ace5a689"
+          }
+        },
+        "required": [
+          "temps",
+          "userID",
+          "trailID"
+        ]
+      },
+      "ResultatPartialData": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique du résultat",
+            "example": "6cf8e6fedc4cf8b5ace5a689"
+          },
+          "temps": {
+            "type": "integer",
+            "description": "Temps en secondes mis pour faire le parcours",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "example": "600"
+          },
+          "utilisateur": {
+            "type": "string",
+            "description": "Le nom de la personne qui a fait ce temps",
+            "example": "John"
+          },
+          "parcours": {
+            "type": "object",
+            "description": "Le parcours finalisé",
+            "properties": {
+              "id":{
+                "type": "string",
+                "description": "Identifiant unique du parcours",
+                "example": "00f8e6fedc4cf8b5ace5a689"
+              },
+              "nom": {
+                "type": "string",
+                "description": "Nom du parcours",
+                "minLength": 3,
+                "maxLength": 30,
+                "example": "Printemps 1"
+              }
+            }
           }
         },
         "required": [
