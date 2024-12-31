@@ -281,6 +281,253 @@
           }
         }
       }
+    },
+    "/parcours": {
+      "post": {
+        "summary": "Créer un nouveau parcours",
+        "tags": ["parcours"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrailData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Parcours créé avec succès",
+            "headers": {
+              "Location": {
+                "description": "URL du nouveau parcours",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }, 
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrailCreateResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "get": {
+        "summary": "Récupérer la liste des parcours",
+        "tags": ["parcours"],
+        "parameters": [
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Inclure des informations supplémentaires (user)",
+            "schema": {
+              "type": "string",
+              "enum": ["user"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des parcours récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartialTrailData"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/parcours/{id}": {
+      "get": {
+        "summary": "Récupérer un parcours par son ID",
+        "tags": ["parcours"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "description": "Inclure les résultats (postes)",
+            "schema": {
+              "type": "string",
+              "enum": ["postes"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Parcours récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrailWithResults"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "summary": "Modifier un parcours (remplacement complet)",
+        "tags": ["parcours"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrailData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcours modifié avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trail"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Modifier partiellement un parcours",
+        "tags": ["parcours"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TrailData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parcours modifié avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Trail"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Supprimer un parcours",
+        "tags": ["parcours"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Parcours supprimé avec succès"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -860,6 +1107,83 @@
             "description": "Descriptif du parcours",
             "example": "Ce parcours peut se faire en famille avec une poucette..."
           },
+          "nbr_posts": {
+            "type": "integer",
+            "description": "Le nombre des postes qui sont dans le parcours",
+            "example": 2
+          },
+          "nomCreateur": {
+            "type": "string",
+            "description": "Nom de la personne qui a créé le parcours",
+            "example": "John"
+          }
+        }
+      },
+      "TrailCreateResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "type": "object",
+            "properties" : {
+              "id": {
+                "type": "string",
+                "description": "Identifiant unique du parcours",
+                "example": "00f8e6fedc4cf8b5ace5a689"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/TrailData"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "description": "Date de création du parcours",
+                "format": "date-time",
+                "example": "2022-01-01T00:00:00Z"
+              },
+              "createdBy": {
+                "type": "object",
+                "allOf":[
+                { "$ref": "#/components/schemas/Person" }
+                ]
+              }
+            }
+          }]
+      },
+      "TrailWithResults": {
+            "type": "object",
+            "properties": {
+              "id": {
+            "type": "string",
+            "description": "Identifiant unique du parcours",
+            "example": "00f8e6fedc4cf8b5ace5a689"
+          },
+          "nom": {
+            "type": "string",
+            "description": "Nom du parcours",
+            "minLength": 3,
+            "maxLength": 30,
+            "example": "Printemps 1"
+          },
+          "difficulte": {
+            "type": "string",
+            "description": "Difficulté du parcours",
+            "enum": [
+              "facile",
+              "moyen",
+              "difficle",
+              "très difficle"
+            ],
+            "example": "facile"
+          },
+          "descr": {
+            "type": "string",
+            "description": "Descriptif du parcours",
+            "example": "Ce parcours peut se faire en famille avec une poucette..."
+          },
           "postesInclus": {
             "type": "array",
             "description": "La liste des postes qui sont dans le parcours",
@@ -867,8 +1191,28 @@
               "type": "string"
             },
             "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
-          }
-        }
+          },
+              "resultatsAct": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "_id": {
+                      "type": "String",
+                      "example": "6cf8e6fedc4cf8b5ace5a689"
+                    },
+                    "temps": {
+                      "type": "integer",
+                      "example": 600
+                    },
+                    "user": {
+                      "type": "string",
+                      "example": "John"
+                    }
+                  }
+                }
+              }
+            }
       }
     }
   }
