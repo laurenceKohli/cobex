@@ -84,6 +84,7 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
     include = req.query.include;
   }
   const query = Parcours.findById(req.params.id)
+  query.populate("postesInclus");
   query.exec()
     .then(parcours => {
       if (parcours === null) {

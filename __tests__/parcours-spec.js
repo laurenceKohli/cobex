@@ -109,7 +109,7 @@ describe('GET /api/parcours/:id WITH BODY', function () {
         expect(response.status).toBe(200);
         expect(response.body.nom).toBe('parcours1');
         expect(response.body.descr).toBe(undefined);
-        expect(JSON.stringify(response.body.postesInclus)).toBe(JSON.stringify(parcours.postesInclus));
+        expect(JSON.stringify(response.body.postesInclus[0].number)).toBe("32");
         expect(response.body.resultatsAct.length).toBe(1);
         expect(response.body.resultatsAct[0].temps).toBe(120);
         expect(response.body.resultatsAct[0].user).toBe('Jane Doe');

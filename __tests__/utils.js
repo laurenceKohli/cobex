@@ -37,10 +37,10 @@ export function createAdminUser(){
 export function createPoste(){
   return Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '31',
+        number: 31,
         images: ['image1']
     })
 }
@@ -49,18 +49,18 @@ export function create2Postes(){
   return Promise.all([
     Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '32',
+        number: 32,
         images: ['image2']
     }),
     Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '33',
+        number: 33,
         images: ['image1', 'image2'],
         descr: "test"
     })
