@@ -64,6 +64,12 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
       }
     },
     {
+      $skip: req.query.page ? (req.query.page - 1) * 4 : 0
+    },
+    {
+      $limit: 4
+    },
+    {
       $unwind: '$user'
     },
     {
