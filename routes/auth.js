@@ -27,6 +27,7 @@ function Authorise(AuthenticationRequired = true) {
         if (!utilisateur) return res.status(401).send("Bearer token no longer corresponds to a user");
         req.currentUserRole = utilisateur.role;
         req.currentUser = utilisateur;
+        console.log("User role : ", req.currentUser);
         return next();
       })
     })

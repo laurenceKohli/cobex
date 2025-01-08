@@ -41,7 +41,8 @@ export function createPoste(){
             "long": 6.643686
         },
         number: 31,
-        images: ['image1']
+        images: ['image1'],
+        code: '31ert'
     })
 }
 
@@ -53,7 +54,8 @@ export function create2Postes(){
             "long": 6.643686
         },
         number: 32,
-        images: ['image2']
+        images: ['image2'],
+        code: '32qwe'
     }),
     Poste.create({
         geoloc: {
@@ -62,7 +64,8 @@ export function create2Postes(){
         },
         number: 33,
         images: ['image1', 'image2'],
-        descr: "test"
+        descr: "test",
+        code: '33qwe'
     })
   ]);
 }

@@ -6,6 +6,7 @@ import * as utils from "./utils.js";
 import { Authorise } from "./auth.js";
 import Poste from "../models/poste.js";
 import e from "express";
+import { configDotenv } from "dotenv";
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
         images: poste.images,
         estAccessible: poste.estAccessible,
         descr: poste.descr,
+        code: poste.code
       }
     );} 
       else {

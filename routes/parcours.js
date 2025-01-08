@@ -174,9 +174,9 @@ router.patch("/:id", utils.VerifyID, utils.requireJson, Authorise(true), functio
 });
 
 router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next) {
-  Parcours.findById(req.params.id).populate("createBy").exec()
+  Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser)) {
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
         return res.status(403).send("Forbidden");
       }
       //else
