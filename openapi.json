@@ -721,7 +721,7 @@
       "Unauthorized": {
         "description": "Non autorisé",
         "content": {
-          "text/html": {
+          "application/json": {
             "example": {
               "message": "Unauthorized"
             }
@@ -731,7 +731,7 @@
       "Forbidden": {
         "description": "Interdit",
         "content": {
-          "text/html": {
+          "application/json": {
             "example": {
               "message": "Forbidden"
             }
@@ -741,9 +741,9 @@
       "NotFound": {
         "description": "Non trouvé",
         "content": {
-          "text/html": {
+          "application/json": {
             "example": {
-              "message": "Not Found"
+              "message": "<STH> not Found"
             }
           }
         }
@@ -943,12 +943,12 @@
               "lat": {
                 "type": "integer",
                 "description": "Latitude du poste",
-                "example": "567 462"
+                "example": "46.781278"
               },
               "long": {
                 "type": "integer",
                 "description": "Longitude du poste",
-                "example": "123 440"
+                "example": "6.646287"
               }
             },
             "description": "Coordonnées du poste"
@@ -1013,12 +1013,12 @@
               "lat": {
                 "type": "integer",
                 "description": "Latitude du poste",
-                "example": "567 462"
+                "example": "46.781278"
               },
               "long": {
                 "type": "integer",
                 "description": "Longitude du poste",
-                "example": "123 440"
+                "example": "6.646287"
               }
             },
             "description": "Coordonnées du poste"
@@ -1045,12 +1045,12 @@
               "lat": {
                 "type": "integer",
                 "description": "Latitude du poste",
-                "example": "567 462"
+                "example": "46.781278"
               },
               "long": {
                 "type": "integer",
                 "description": "Longitude du poste",
-                "example": "123 440"
+                "example": "6.646287"
               }
             },
             "description": "Coordonnées du poste"
