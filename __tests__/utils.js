@@ -83,18 +83,32 @@ export async function createParcours(userId){
     postesInclus: [poste1.id, poste2.id]
 });
 }
-
-export async function createParcoursWithResult(){
-  const resultat = await createResultat();
-  return Parcours.findById(resultat.trailID);
+async function createResultats(parcours){
+  const user = await createUser()
+  for(let i = 0; i < 6; i++){
+    await Resultat.create({
+        trailID: parcours.id,
+        userID: user.id,
+        temps: 130
+    });
+  }
+  return true;
+}
+export async function createParcoursWithResults(){
+  const user = await createAdminUser();
+  const parcours = await createParcours(user.id);
+  const resultats = await createResultats(parcours);
+  return parcours;
  }
 
 export async function createResultat(){
-  const user = await createUser();
+  const user = await createAdminUser();
   const parcours = await createParcours(user.id);
   return Resultat.create({
     trailID: parcours.id,
     userID: user.id,
     temps: 120
 });
+
+
 }

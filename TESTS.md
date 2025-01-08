@@ -1,14 +1,16 @@
 # Intitulés des Tests
-Nombre total de test : 15
+Nombre total de test : 16
 
 ## utilisateurs-spec.js
 1. `POST /api/utilisateurs`
    - `should create a user`
-2. `GET /api/utilisateurs`
+2. `POST /api/utilisateurs`
+   - `should return error name already exists`
+3. `GET /api/utilisateurs`
    - `should retrieve the list of users`
-3. `GET /api/utilisateurs/:id`
+4. `GET /api/utilisateurs/:id`
    - `should retrieve one user name`
-4. `POST /api/utilisateurs/login`
+5. `POST /api/utilisateurs/login`
    - `should valid or not login`
 TODO
 GET /api/utilisateurs?include=isAdmin
@@ -31,17 +33,19 @@ PATCH
 ## parcours-spec.js
 1. `POST /api/parcours`
    - `should create a parcours`
-2. `GET /api/parcours`
+2. `POST /api/parcours`
+   - `should retourn errors`
+3. `GET /api/parcours`
    - `should retrieve the list of parcours`
-3. `GET /api/parcours with BODY`
+4. `GET /api/parcours with BODY`
    - `should retrieve the list of parcours with name of creator`
-4. `GET /api/parcours/:id`
+5. `GET /api/parcours/:id`
    - `should retrieve one parcours or not` 
-5. `GET /api/parcours/:id WITH BODY`
+6. `GET /api/parcours/:id WITH BODY`
    - `should retrieve one parcours with postes`
-6. `PATCH /api/parcours/:id`
+7. `PATCH /api/parcours/:id`
    - `should update partially the parcours`
-7. `DELETE /api/parcours/:id`
+8. `DELETE /api/parcours/:id`
    - `should delete the parcours`
 TODO
 GET /api/parcours/:id?include=postes

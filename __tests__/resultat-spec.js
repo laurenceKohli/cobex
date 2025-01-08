@@ -22,11 +22,20 @@ describe('POST /api/resultats', function () {
             .set('Authorization', 'Bearer '+token)
             .send({
                 trailID: resParcours.body[0].id,
-                userID: user.id,
                 temps: 120
             })
         expect(resultat.status).toBe(201);
         expect(resultat.body.temps).toBe(120);
+
+        // Check user logged
+        const resultat2 = await supertest(app)
+            .post('/api/resultats')
+            .send({
+                trailID: resParcours.body[0].id,
+                temps: 120
+            })
+        expect(resultat2.status).toBe(401);
+        expect(resultat2.text).toBe('Authorization header is missing');
     });
 });
 
