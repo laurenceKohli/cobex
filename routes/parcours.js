@@ -8,6 +8,8 @@ import Resultat from "../models/resultat.js";
 import Utilisateur from "../models/utilisateur.js";
 import { Authorise } from "./auth.js";
 
+const pageLimit = 4;
+
 const router = express.Router();
 
 router.get("/", function (req, res, next) {
@@ -48,55 +50,57 @@ router.get("/", function (req, res, next) {
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
   //permet d'ajouter les resultats des utilisateurs sur le parcours (avec leurs noms)
-  const pipeline = [];
-  pipeline.push(
-    {
-      $match: {
-        "trailID": new mongoose.Types.ObjectId(req.params.id)
+  Resultat.find({ trailID: req.params.id }).countDocuments().then(total=> {
+    const pipeline = [];
+    pipeline.push(
+      {
+        $match: {
+          "trailID": new mongoose.Types.ObjectId(req.params.id)
+        }
+      },
+      {
+        $lookup: {
+          from: 'utilisateurs',
+          localField: 'userID',
+          foreignField: '_id',
+          as: 'user'
+        }
+      },
+      {
+        $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
+      },
+      {
+        $limit: pageLimit
+      },
+      {
+        $unwind: '$user'
+      },
+      {
+        $project: {
+          temps: 1,
+          user: '$user.nom'
+        }
+      },
+      {
+        $sort: {
+          temps: 1 // Trier par temps du plus petit au plus grand
+        }
       }
-    },
-    {
-      $lookup: {
-        from: 'utilisateurs',
-        localField: 'userID',
-        foreignField: '_id',
-        as: 'user'
-      }
-    },
-    {
-      $skip: req.query.page ? (req.query.page - 1) * 4 : 0
-    },
-    {
-      $limit: 4
-    },
-    {
-      $unwind: '$user'
-    },
-    {
-      $project: {
-        temps: 1,
-        user: '$user.nom'
-      }
-    },
-    {
-      $sort: {
-        temps: 1 // Trier par temps du plus petit au plus grand
-      }
+    );
+  
+    let include = false;
+    if (req.query) {
+      include = req.query.include;
     }
-  );
-
-  let include = false;
-  if (req.query) {
-    include = req.query.include;
-  }
-  const query = Parcours.findById(req.params.id)
-  query.populate("postesInclus");
-  query.exec()
+    const query = Parcours.findById(req.params.id)
+    query.populate("postesInclus");
+    query.exec()
     .then(parcours => {
+      
       if (parcours === null) {
         return res.status(404).send("Parcours not found");
       }
-
+  
       if (include?.includes("postes")) {
         Resultat.aggregate(pipeline)
           .exec()
@@ -108,7 +112,8 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
                 difficulte: parcours.difficulte,
                 descr: parcours.descr,
                 postesInclus: parcours.postesInclus,
-                resultatsAct: resultats
+                resultatsAct: resultats,
+                nombrePages: Math.ceil(total/pageLimit)
               }
             )
           })
@@ -122,6 +127,8 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
       )}
     })
     .catch(next);
+
+  })
 });
 
 router.post("/", utils.requireJson, Authorise(true), function (req, res, next) {

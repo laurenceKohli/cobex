@@ -7,21 +7,25 @@ import Resultat from "../models/resultat.js";
 import utilisateur from "../models/utilisateur.js";
 import { Authorise } from "./auth.js";
 
+const pageLimit = 4;
+
 const router = express.Router();
 
 router.get("/", function (req, res, next) {
+  let total = null;
+  let returnedResultats
   let query = Resultat.find()
   if (req.query.utilisateurs){
     query = Resultat.find({userID : req.query.utilisateurs})
     if (req.query.parcours){
       query = Resultat.find({userID : req.query.utilisateurs}, {trailID : req.query.parcours})
     }
-  }else if (req.query.parcours){
+  } else if (req.query.parcours){
     if (!req.query.page || req.query.page <= 1){
-      return query = Resultat.find({trailID : req.query.parcours}).limit(4)
+      query = Resultat.find({trailID : req.query.parcours}).limit(pageLimit)
+    }else{
+      query = Resultat.find({trailID : req.query.parcours}).skip(Math.floor(req.query.page - 1) * pageLimit).limit(pageLimit)
     }
-    //else
-    query = Resultat.find({trailID : req.query.parcours}).skip(Math.floor(req.query.page - 1) * 4).limit(4)
   }
 
   let include = false;
@@ -35,45 +39,57 @@ router.get("/", function (req, res, next) {
   if (include?.includes("parcours")) {
     query.populate("trailID");
   }
-  query.exec()
-  .then(resultats => {
-    console.log(`Found ${resultats.length} postes`);
-    res.send(resultats.map(resultat => {
-      
-    if (include?.includes("utilisateurs")) {
-      if (include.includes("parcours")) {
-        return {
+  query.exec().then(resultats => {
+    const data = resultats.map(resultat => {        
+      if (include?.includes("utilisateurs")) {
+        if (include.includes("parcours")) {
+          returnedResultats = {
+            id: resultat._id,
+            temps: resultat.temps,
+            utilisateur: resultat.userID.nom,
+            parcours: {
+              id: resultat.trailID._id,
+              nom : resultat.trailID.nom,
+            }
+          };
+        } else {
+          returnedResultats = {
+            id: resultat._id,
+            temps: resultat.temps,
+            utilisateur: resultat.userID.nom,
+          };
+        }
+      } else if (include?.includes("parcours")) {
+        returnedResultats = {
           id: resultat._id,
           temps: resultat.temps,
-          utilisateur: resultat.userID.nom,
           parcours: {
             id: resultat.trailID._id,
             nom : resultat.trailID.nom,
           }
         };
+      } else {
+        returnedResultats = {
+          id: resultat._id,
+          temps: resultat.temps,
+        };
       }
-      //else
-      return {
-        id: resultat._id,
-        temps: resultat.temps,
-        utilisateur: resultat.userID.nom,
-      };
-    }else if (include?.includes("parcours")) {
-      return {
-        id: resultat._id,
-        temps: resultat.temps,
-        parcours: {
-          id: resultat.trailID._id,
-          nom : resultat.trailID.nom,
-        }
-      };
+      return returnedResultats;
+    });
+
+    if (req.query.parcours){
+      Resultat.find({trailID : req.query.parcours}).countDocuments().then(count=> {
+        total = count
+      }).then(() => {
+        res.send({
+          nbPages: Math.ceil(total / pageLimit),
+          data
+        });
+      })
+    } else {
+      res.send({ data });
     }
-    //else
-    return {
-      id: resultat._id,
-      temps: resultat.temps,
-    };
-    }));
+
   })
   .catch(next);
 });
