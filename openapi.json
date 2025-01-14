@@ -7,10 +7,12 @@
   },
   "servers": [
     {
-      "url": "https://cobex-uu6t.onrender.com/api"
+      "url": "https://cobex-uu6t.onrender.com/api",
+      "description" : "URL online, elle peut mettre jusqu'à une minute pour répondre"
     },
     {
-      "url": "http://localhost:3000/api"
+      "url": "http://localhost:3000/api",
+      "description" : "URL local pour faire des tests"
     }
   ],
   "tags": [
@@ -56,10 +58,22 @@
                   "$ref": "#/components/schemas/PersonWithToken"
                 }
               }
+            },
+            "headers": {
+              "Location": {
+                "description": "URL de l'utilisateur créé",
+                "schema": {
+                  "type": "string",
+                  "example" : "http://localhost:4000;/api/utilisateurs/7038e6fedc4cf8b5ace5a689"
+                }
+              }
             }
           },
           "400": {
             "$ref": "#/components/responses/PersonValidationError"
+          },
+          "500":{
+            "$ref": "#/components/responses/MissingData"
           }
         }
       },
@@ -72,7 +86,7 @@
           {
             "name": "include",
             "in": "query",
-            "description": "Inclure le role des utilisateurs dans la réponse",
+            "description": "Inclure le role des utilisateurs dans la réponse <br> Uniquement accessible par les superAdmin",
             "required": false,
             "schema": {
               "type": "string",
@@ -91,7 +105,49 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PartialPersonData"
+                    "oneOf": [
+                      {
+                        "description": "Réponse sans le paramètre `include`",
+                        "$ref": "#/components/schemas/PartialPersonData"
+                      },
+                      {
+                        "description": "Réponse avec le paramètre `include=role`",
+                        "allOf": [
+                      {
+                        "$ref": "#/components/schemas/PartialPersonData"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "role": {
+                            "type": "string",
+                            "example": "admin"
+                          }
+                        }
+                      }
+                    ]
+                      }
+                    ]
+                  }
+                },
+                "examples": {
+                  "withoutInclude": {
+                    "summary": "Sans paramètre de requête",
+                    "value": [
+                      { "id": 1, "name": "Alice" },
+                      { "id": 2, "name": "Bob" }
+                    ]
+                  },
+                  "withInclude": {
+                    "summary": "Avec paramètre `include=role`",
+                    "value": [
+                      {
+                        "id": 1, "name": "Alice", "role": "admin"
+                      },
+                      {
+                        "id": 2, "name": "Bob", "role": "utilisateur"
+                      }
+                    ]
                   }
                 }
               }
@@ -107,21 +163,21 @@
       }
     },
     "/utilisateurs/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID de l'utilisateur à récupérer"
+        }
+      ],
       "get": {
         "summary": "Récupérer un utilisateur par son ID",
         "tags": [
           "utilisateurs"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID de l'utilisateur à récupérer"
-          }
         ],
         "responses": {
           "200": {
@@ -168,6 +224,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
+          },
+          "500":{
+            "$ref": "#/components/responses/MissingData"
           }
         }
       }
@@ -196,12 +255,7 @@
       }
     },
     "/postes/{id}": {
-      "get": {
-        "summary": "Récupérer un poste par son ID",
-        "tags": [
-          "postes"
-        ],
-        "parameters": [
+      "parameters": [
           {
             "name": "id",
             "in": "path",
@@ -211,6 +265,11 @@
             },
             "description": "ID du poste à récupérer"
           }
+        ],
+      "get": {
+        "summary": "Récupérer un poste par son ID",
+        "tags": [
+          "postes"
         ],
         "responses": {
           "200": {
@@ -232,17 +291,6 @@
         "summary": "Modifier l'accès à un poste",
         "tags": [
           "postes"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID du poste à récupérer"
-          }
         ],
         "security": [
           {
@@ -363,18 +411,21 @@
       }
     },
     "/parcours/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID de l'utilisateur à récupérer"
+        }
+      ],
       "get": {
         "summary": "Récupérer un parcours par son ID",
         "tags": ["parcours"],
         "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "include",
             "in": "query",
@@ -407,16 +458,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "requestBody": {
@@ -456,16 +497,6 @@
             "bearerAuth": []
           }
         ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -501,16 +532,6 @@
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -663,22 +684,23 @@
       }
     },
     "/resultats/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID de l'utilisateur à récupérer"
+        }
+      ],
       "delete": {
         "summary": "Supprimer un résultat, lors de la suppression du parcours",
         "tags": ["resultats"],
         "security": [
           {
             "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -701,50 +723,44 @@
   "components": {
     "responses": {
       "PersonValidationError": {
-        "description": "The person is invalid",
+        "description": "Personne invalide",
         "content": {
           "application/json": {
             "example": {
-              "msg": "Utilisateur validation failed : nom: Person Max already exists §§usernameExists§§",
-              "errors": {
-                "nom": {
-                  "kind": "String",
-                  "message": "Person `Max` already exists §§usernameExists§§",
-                  "name": "validatePersonNameUniqueness",
-                  "value": "Max"
-                }
-              }
+              "msg": "Utilisateur validation failed : nom: Person Max already exists §§usernameExists§§"
             }
           }
         }
       },
       "Unauthorized": {
-        "description": "Non autorisé",
+        "description": "Non autorisé (utilisateur non connecté)",
         "content": {
-          "application/json": {
-            "example": {
-              "message": "Unauthorized"
-            }
+          "text/html": {
+            "example": "Unauthorized"
           }
         }
       },
       "Forbidden": {
-        "description": "Interdit",
+        "description": "Interdit (personne connectée mais pas avec le bon rôle)",
         "content": {
-          "application/json": {
-            "example": {
-              "message": "Forbidden"
-            }
+          "text/html": {
+            "example": "Forbidden"
           }
         }
       },
       "NotFound": {
         "description": "Non trouvé",
         "content": {
-          "application/json": {
-            "example": {
-              "message": "<STH> not Found"
-            }
+          "text/html": {
+            "example": "<STH> not found"
+          }
+        }
+      },
+      "MissingData": {
+        "description": "Données obligatoires manquantes",
+        "content": {
+          "text/html": {
+            "example":"data and [salt, hash] arguments required"
           }
         }
       }
@@ -774,7 +790,7 @@
           "mdp": {
             "type": "string",
             "description": "Mot de passe de l'utilisateur",
-            "example": "SuperMotDePasse",
+            "example": "$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym",
             "format": "password"
           },
           "role": {
@@ -902,10 +918,12 @@
         "type": "object",
         "properties": {
           "nom": {
-            "type": "string"
+            "type": "string",
+            "example" : "John"
           },
           "mdp": {
-            "type": "string"
+            "type": "string",
+            "example": "SuperMotDePasse"
           }
         },
         "required": [
