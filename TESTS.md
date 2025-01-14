@@ -42,15 +42,12 @@ PATCH
 5. `GET /api/parcours/:id`
    - `should retrieve one parcours or not` 
 6. `GET /api/parcours/:id WITH BODY`
-   - `should retrieve one parcours with postes`
+   - `should retrieve one parcours with postes and resultats paginated`
 7. `PATCH /api/parcours/:id`
    - `should update partially the parcours`
 8. `DELETE /api/parcours/:id`
    - `should delete the parcours`
 TODO
-GET /api/parcours/:id?include=postes
-GET /api/parcours?include=user
 PUT
-!! PATCH
 ## example-spec.js
 1. `should work`

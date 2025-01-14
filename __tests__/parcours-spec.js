@@ -125,7 +125,7 @@ describe('GET /api/parcours/:id', function () {
 });
 
 describe('GET /api/parcours/:id WITH BODY', function () {
-    it('should retrieve one parcours with postes', async function () {
+    it('should retrieve one parcours with postes and resultats paginated', async function () {
         // Create a parcours in the database before test in this block.
         const parcours = await createParcoursWithResults();
 
@@ -138,6 +138,7 @@ describe('GET /api/parcours/:id WITH BODY', function () {
         expect(response.body.resultatsAct.length).toBe(4);
         expect(response.body.resultatsAct[0].temps).toBe(130);
         expect(response.body.resultatsAct[0].user).toBe('Jane Doe');
+        expect(response.body.nombrePages).toBe(2);
     });
 });
 
