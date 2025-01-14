@@ -43,7 +43,7 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
       }
     );} 
       else {
-        res.status(404).send("Not found");
+        res.status(404).send("Poste not found");
     }
   })
   

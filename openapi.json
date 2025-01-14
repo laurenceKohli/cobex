@@ -8,11 +8,11 @@
   "servers": [
     {
       "url": "https://cobex-uu6t.onrender.com/api",
-      "description" : "URL online, elle peut mettre jusqu'à une minute pour répondre"
+      "description": "URL online, elle peut mettre jusqu'à une minute pour répondre"
     },
     {
       "url": "http://localhost:3000/api",
-      "description" : "URL local pour faire des tests"
+      "description": "URL local pour faire des tests"
     }
   ],
   "tags": [
@@ -64,7 +64,7 @@
                 "description": "URL de l'utilisateur créé",
                 "schema": {
                   "type": "string",
-                  "example" : "http://localhost:4000;/api/utilisateurs/7038e6fedc4cf8b5ace5a689"
+                  "example": "http://localhost:4000;/api/utilisateurs/7038e6fedc4cf8b5ace5a689"
                 }
               }
             }
@@ -72,7 +72,7 @@
           "400": {
             "$ref": "#/components/responses/PersonValidationError"
           },
-          "500":{
+          "500": {
             "$ref": "#/components/responses/MissingData"
           }
         }
@@ -108,24 +108,24 @@
                     "oneOf": [
                       {
                         "description": "Réponse sans le paramètre `include`",
-                        "$ref": "#/components/schemas/PartialPersonData"
+                        "$ref": "#/components/schemas/BasePerson"
                       },
                       {
                         "description": "Réponse avec le paramètre `include=role`",
                         "allOf": [
-                      {
-                        "$ref": "#/components/schemas/PartialPersonData"
-                      },
-                      {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string",
-                            "example": "admin"
+                          {
+                            "$ref": "#/components/schemas/BasePerson"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "role": {
+                                "type": "string",
+                                "example": "admin"
+                              }
+                            }
                           }
-                        }
-                      }
-                    ]
+                        ]
                       }
                     ]
                   }
@@ -134,18 +134,28 @@
                   "withoutInclude": {
                     "summary": "Sans paramètre de requête",
                     "value": [
-                      { "id": 1, "name": "Alice" },
-                      { "id": 2, "name": "Bob" }
+                      {
+                        "id": 1,
+                        "name": "Alice"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Bob"
+                      }
                     ]
                   },
                   "withInclude": {
                     "summary": "Avec paramètre `include=role`",
                     "value": [
                       {
-                        "id": 1, "name": "Alice", "role": "admin"
+                        "id": 1,
+                        "name": "Alice",
+                        "role": "admin"
                       },
                       {
-                        "id": 2, "name": "Bob", "role": "utilisateur"
+                        "id": 2,
+                        "name": "Bob",
+                        "role": "utilisateur"
                       }
                     ]
                   }
@@ -185,10 +195,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PartialPersonData"
+                  "$ref": "#/components/schemas/BasePerson"
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/NotID"
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
@@ -225,7 +238,7 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
-          "500":{
+          "500": {
             "$ref": "#/components/responses/MissingData"
           }
         }
@@ -245,7 +258,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/PosteData"
+                    "$ref": "#/components/schemas/BasePoste"
                   }
                 }
               }
@@ -256,16 +269,16 @@
     },
     "/postes/{id}": {
       "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID du poste à récupérer"
-          }
-        ],
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          },
+          "description": "ID du poste à récupérer"
+        }
+      ],
       "get": {
         "summary": "Récupérer un poste par son ID",
         "tags": [
@@ -282,13 +295,16 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/NotID"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
         }
       },
       "patch": {
-        "summary": "Modifier l'accès à un poste",
+        "summary": "Modifier l'accès à un poste (uniquement accessible aux superAdmin)",
         "tags": [
           "postes"
         ],
@@ -300,29 +316,58 @@
         "requestBody": {
           "content": {
             "application/json": {
-                "description": "Indique si le poste est accessible actuellement",
-                "example": "estAccessible: false"
+              "description": "Indique si le poste est accessible actuellement",
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estAccessible": {
+                    "type": "boolean",
+                    "description": "Indique si le poste est accessible actuellement",
+                    "example": false
+                  }
+                },
+                "required": [
+                  "estAccessible"
+                ]
               }
             }
-          },
+          }
+        },
         "responses": {
           "200": {
             "description": "Poste modifié avec succès",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Poste"
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Poste"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string",
+                          "description": "Le code du QR du poste",
+                          "example": "37ahj"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
           },
           "400": {
             "description": "Aucune donnée à modifier",
-            "content":{
-            "text/html": {
-              "example": "No data to update"
+            "content": {
+              "text/html": {
+                "example": "No data to update"
               }
             }
+          },
+          "401": {
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -333,7 +378,9 @@
     "/parcours": {
       "post": {
         "summary": "Créer un nouveau parcours",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -359,7 +406,7 @@
                   "type": "string"
                 }
               }
-            }, 
+            },
             "content": {
               "application/json": {
                 "schema": {
@@ -381,7 +428,9 @@
       },
       "get": {
         "summary": "Récupérer la liste des parcours",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "parameters": [
           {
             "name": "include",
@@ -389,7 +438,9 @@
             "description": "Inclure des informations supplémentaires (user)",
             "schema": {
               "type": "string",
-              "enum": ["user"]
+              "enum": [
+                "user"
+              ]
             }
           }
         ],
@@ -424,7 +475,9 @@
       ],
       "get": {
         "summary": "Récupérer un parcours par son ID",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "parameters": [
           {
             "name": "include",
@@ -432,7 +485,9 @@
             "description": "Inclure les résultats (postes)",
             "schema": {
               "type": "string",
-              "enum": ["postes"]
+              "enum": [
+                "postes"
+              ]
             }
           }
         ],
@@ -447,6 +502,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/NotID"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound"
           }
@@ -454,7 +512,9 @@
       },
       "put": {
         "summary": "Modifier un parcours (remplacement complet)",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -480,6 +540,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/NotID"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -491,7 +554,9 @@
       },
       "patch": {
         "summary": "Modifier partiellement un parcours",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -518,6 +583,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/NotID"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
           },
@@ -528,7 +596,9 @@
       },
       "delete": {
         "summary": "Supprimer un parcours",
-        "tags": ["parcours"],
+        "tags": [
+          "parcours"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -537,6 +607,9 @@
         "responses": {
           "204": {
             "description": "Parcours supprimé avec succès"
+          },
+          "400": {
+            "$ref": "#/components/responses/NotID"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -553,7 +626,9 @@
     "/resultats": {
       "post": {
         "summary": "Créer un nouveau résultat",
-        "tags": ["resultats"],
+        "tags": [
+          "resultats"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -581,13 +656,15 @@
             }
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized" 
+            "$ref": "#/components/responses/Unauthorized"
           }
         }
       },
       "get": {
         "summary": "Récupérer les résultats",
-        "tags": ["resultats"],
+        "tags": [
+          "resultats"
+        ],
         "parameters": [
           {
             "name": "utilisateurs",
@@ -599,7 +676,7 @@
           },
           {
             "name": "parcours",
-            "in": "query", 
+            "in": "query",
             "description": "Filtrer par ID parcours",
             "schema": {
               "type": "string"
@@ -620,7 +697,10 @@
             "description": "Inclure des informations supplémentaires",
             "schema": {
               "type": "string",
-              "enum": ["utilisateurs", "parcours"]
+              "enum": [
+                "utilisateurs",
+                "parcours"
+              ]
             }
           }
         ],
@@ -644,7 +724,9 @@
     "/resultats/{userId}": {
       "patch": {
         "summary": "Anonymiser les résultats d'un utilisateur, lors de la suppression de son compte",
-        "tags": ["resultats"],
+        "tags": [
+          "resultats"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -668,11 +750,21 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ResultatAnonymized"
+                    "$ref": "#/components/schemas/Resultat"
+                  },
+                  "exemple": {
+                    "id": "6cf8e6fedc4cf8b5ace5a689",
+                    "temps": 600,
+                    "userID": "6cf8e6fedc4cf8b5ace5a61234",
+                    "trailID": "00f8e6fedc4cf8b5ace5a689",
+                    "createdAt": "2022-01-01T00:00:00Z"
                   }
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/NotID"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -697,7 +789,9 @@
       ],
       "delete": {
         "summary": "Supprimer un résultat, lors de la suppression du parcours",
-        "tags": ["resultats"],
+        "tags": [
+          "resultats"
+        ],
         "security": [
           {
             "bearerAuth": []
@@ -706,6 +800,9 @@
         "responses": {
           "204": {
             "description": "Résultat supprimé avec succès"
+          },
+          "400": {
+            "$ref": "#/components/responses/NotID"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -740,6 +837,14 @@
           }
         }
       },
+      "NotConnected": {
+        "description": "Personne non connectée",
+        "content": {
+          "text/html": {
+            "example": "Authorization header is missing"
+          }
+        }
+      },
       "Forbidden": {
         "description": "Interdit (personne connectée mais pas avec le bon rôle)",
         "content": {
@@ -760,13 +865,21 @@
         "description": "Données obligatoires manquantes",
         "content": {
           "text/html": {
-            "example":"data and [salt, hash] arguments required"
+            "example": "data and [salt, hash] arguments required"
+          }
+        }
+      },
+      "NotID": {
+        "description": "ID invalide",
+        "content": {
+          "text/html": {
+            "example": "Invalid ID"
           }
         }
       }
     },
     "schemas": {
-      "Person": {
+      "BasePerson": {
         "type": "object",
         "properties": {
           "id": {
@@ -780,109 +893,17 @@
             "minLength": 3,
             "maxLength": 30,
             "example": "John"
-          },
-          "mail": {
-            "type": "mail",
-            "description": "Mail de l'utilisateur",
-            "example": "example@example.com",
-            "format": "email"
-          },
-          "mdp": {
-            "type": "string",
-            "description": "Mot de passe de l'utilisateur",
-            "example": "$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym",
-            "format": "password"
-          },
-          "role": {
-            "type": "string",
-            "description": "Rôle de l'utilisateur",
-            "enum": [
-              "utilisateur",
-              "admin",
-              "superAdmin"
-            ],
-            "example": "utilisateur"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Date de création de l'utilisateur",
-            "format": "date-time",
-            "example": "2022-01-01T00:00:00Z"
-          }
-        },
-        "required": [
-          "id",
-          "nom",
-          "mail",
-          "mdp",
-          "estAdmin",
-          "createdAt"
-        ]
-      },
-      "PersonData": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "description": "Prénom de l'utilisateur",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "John"
-          },
-          "mail": {
-            "type": "string",
-            "description": "Mail de l'utilisateur",
-            "example": "example@example.com",
-            "format": "email"
-          },
-          "mdp": {
-            "type": "string",
-            "description": "Mot de passe de l'utilisateur",
-            "example": "SuperMotDePasse",
-            "format": "password"
-          }
-        },
-        "required": [
-          "nom",
-          "mail",
-          "mdp"
-        ]
-      },
-      "PartialPersonData": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique de l'utilisateur",
-            "example": "7038e6fedc4cf8b5ace5a689"
-          },
-          "nom": {
-            "type": "string",
-            "description": "Prénom de l'utilisateur",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "John"
           }
         }
       },
-      "PersonWithToken": {
-        "type": "object",
-        "properties": {
-          "savedPerson": {
+      "SavedPerson": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePerson"
+          },
+          {
             "type": "object",
             "properties": {
-              "id": {
-                "type": "string",
-                "description": "Identifiant unique de l'utilisateur",
-                "example": "7038e6fedc4cf8b5ace5a689"
-              },
-              "nom": {
-                "type": "string",
-                "description": "Nom de l'utilisateur",
-                "minLength": 3,
-                "maxLength": 30,
-                "example": "John"
-              },
               "mail": {
                 "type": "mail",
                 "description": "Mail de l'utilisateur",
@@ -906,20 +927,33 @@
                 "example": "2022-01-01T00:00:00Z"
               }
             }
-          },
-          "token": {
-            "type": "string",
-            "description": "Token d'authentification",
-            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzY2N2FlMjQ4NjFhMzFiYmIzMmU1MjAiLCJleHAiOjE3MzQ4NTU3NzgsImlhdCI6MTczNDc2OTM3OH0.NcxYZbhJwwYRUr0H9g780gKyvvspt85GOTiwRb7luP8"
           }
-        }
+        ]
+      },
+      "Person": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SavedPerson"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mdp": {
+                "type": "string",
+                "description": "Mot de passe de l'utilisateur",
+                "example": "$2b$10$IAIz7tCzFRbES144XpFnWuloD5i/1crzvntErVJZ1AbGRPQNyqQym",
+                "format": "password"
+              }
+            }
+          }
+        ]
       },
       "LoginData": {
         "type": "object",
         "properties": {
           "nom": {
             "type": "string",
-            "example" : "John"
+            "example": "John"
           },
           "mdp": {
             "type": "string",
@@ -930,6 +964,40 @@
           "nom",
           "mdp"
         ]
+      },
+      "PersonData": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LoginData"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mail": {
+                "type": "string",
+                "description": "Mail de l'utilisateur",
+                "example": "example@example.com",
+                "format": "email"
+              }
+            },
+            "required": [
+              "mail"
+            ]
+          }
+        ]
+      },
+      "PersonWithToken": {
+        "type": "object",
+        "properties": {
+          "savedPerson": {
+            "$ref": "#/components/schemas/SavedPerson"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token d'authentification",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzY2N2FlMjQ4NjFhMzFiYmIzMmU1MjAiLCJleHAiOjE3MzQ4NTU3NzgsImlhdCI6MTczNDc2OTM3OH0.NcxYZbhJwwYRUr0H9g780gKyvvspt85GOTiwRb7luP8"
+          }
+        }
       },
       "LoginResponse": {
         "type": "object",
@@ -947,7 +1015,33 @@
           }
         }
       },
-      "Poste": {
+      "Geoloc": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "integer",
+            "description": "Latitude du poste",
+            "example": 46.781278
+          },
+          "long": {
+            "type": "integer",
+            "description": "Longitude du poste",
+            "example": 6.646287
+          },
+          "id": {
+            "type": "string",
+            "description": "Identifiant unique de la géolocalisation",
+            "example": "d038e6fedc4cf8b5ace5a123"
+          },
+          "_id": {
+            "type": "string",
+            "description": "Identifiant unique de la géolocalisation",
+            "example": "d038e6fedc4cf8b5ace5a123"
+          }
+        },
+        "description": "Coordonnées du poste"
+      },
+      "BasePoste": {
         "type": "object",
         "properties": {
           "id": {
@@ -955,143 +1049,97 @@
             "description": "Identifiant unique du poste",
             "example": "d038e6fedc4cf8b5ace5a689"
           },
-          "geoloc": {
-            "type": "object",
-            "properties": {
-              "lat": {
-                "type": "integer",
-                "description": "Latitude du poste",
-                "example": "46.781278"
-              },
-              "long": {
-                "type": "integer",
-                "description": "Longitude du poste",
-                "example": "6.646287"
-              }
-            },
-            "description": "Coordonnées du poste"
-          },
           "number": {
             "type": "integer",
             "description": "Le numéro de poste tel que inscrit sur la carte globale",
             "minimum": 30,
             "exclusiveMinimum": true,
-            "example": "37"
+            "example": 37
           },
-          "estAccessible": {
-            "type": "boolean",
-            "description": "Indique si le poste est accessible actuellement",
-            "example": true
-          },
-          "images": {
-            "type": "array",
-            "description": "Toutes les images qui sont liées au poste",
-            "items": {
-              "type": "string",
-              "format": "url"
-            }
-          },
-          "descr": {
-            "type": "string",
-            "description": "Descritpion du poste",
-            "example": "A gauche de ce poste se trouve l'arbre cententaire.."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Date de création du résultat",
-            "format": "date-time",
-            "example": "2022-01-01T00:00:00Z"
+          "geoloc": {
+            "$ref": "#/components/schemas/Geoloc"
           }
         },
         "required": [
           "id",
           "geoloc",
-          "number",
-          "estAccessible",
-          "createdAt"
+          "number"
         ]
       },
-      "PosteData": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du poste",
-            "example": "d038e6fedc4cf8b5ace5a689"
+      "Poste": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePoste"
           },
-          "number": {
-            "type": "integer",
-            "description": "Le numéro de poste tel que inscrit sur la carte globale",
-            "minimum": 30,
-            "exclusiveMinimum": true,
-            "example": "37"
-          },
-          "geoloc": {
+          {
             "type": "object",
             "properties": {
-              "lat": {
-                "type": "integer",
-                "description": "Latitude du poste",
-                "example": "46.781278"
+              "estAccessible": {
+                "type": "boolean",
+                "description": "Indique si le poste est accessible actuellement",
+                "example": true
               },
-              "long": {
-                "type": "integer",
-                "description": "Longitude du poste",
-                "example": "6.646287"
+              "images": {
+                "type": "array",
+                "description": "Toutes les images qui sont liées au poste",
+                "items": {
+                  "type": "string",
+                  "format": "url"
+                }
+              },
+              "descr": {
+                "type": "string",
+                "description": "Description du poste",
+                "example": "A gauche de ce poste se trouve l'arbre centenaire..."
+              },
+              "createdAt": {
+                "type": "string",
+                "description": "Date de création du poste",
+                "format": "date-time",
+                "example": "2022-01-01T00:00:00Z"
               }
             },
-            "description": "Coordonnées du poste"
+            "required": [
+              "estAccessible",
+              "createdAt"
+            ]
           }
-        }
+        ]
       },
       "PartialPosteData": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du poste",
-            "example": "d038e6fedc4cf8b5ace5a689"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasePoste"
           },
-          "number": {
-            "type": "integer",
-            "description": "Le numéro de poste tel que inscrit sur la carte globale",
-            "minimum": 30,
-            "exclusiveMinimum": true,
-            "example": "37"
-          },
-          "geoloc": {
+          {
             "type": "object",
             "properties": {
-              "lat": {
-                "type": "integer",
-                "description": "Latitude du poste",
-                "example": "46.781278"
+              "estAccessible": {
+                "type": "boolean",
+                "description": "Indique si le poste est accessible actuellement",
+                "example": true
               },
-              "long": {
-                "type": "integer",
-                "description": "Longitude du poste",
-                "example": "6.646287"
+              "images": {
+                "type": "array",
+                "description": "Toutes les images qui sont liées au poste",
+                "items": {
+                  "type": "string",
+                  "format": "url"
+                }
+              },
+              "descr": {
+                "type": "string",
+                "description": "Description du poste",
+                "example": "A gauche de ce poste se trouve l'arbre centenaire..."
+              },
+              "code": {
+                "type": "string",
+                "description": "Le code du QR du poste",
+                "example": "37ahj"
               }
-            },
-            "description": "Coordonnées du poste"
-          },
-          "estAccessible": {
-            "type": "boolean",
-            "description": "Indique si le poste est accessible actuellement",
-            "example": true
-          },
-          "images": {
-            "type": "array",
-            "description": "Toutes les images qui sont liées au poste",
-            "items": {
-              "type": "string",
-              "format": "url"
             }
-          },
-          "descr": {
-            "type": "string",
-            "description": "Descritpion du poste",
-            "example": "A gauche de ce poste se trouve l'arbre cententaire..."
           }
-        }
+        ]
       },
       "Resultat": {
         "type": "object",
@@ -1132,39 +1180,6 @@
           "trailID",
           "createdAt"
         ]
-      },
-      "ResultatAnonymized": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du résultat",
-            "example": "6cf8e6fedc4cf8b5ace5a689"
-          },
-          "temps": {
-            "type": "integer",
-            "description": "Temps en secondes mis pour faire le parcours",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": "600"
-          },
-          "userID": {
-            "type": "string",
-            "description": "L'identifiant de anonyme",
-            "example": "7038e6fedc4cf8b5ace5a123"
-          },
-          "trailID": {
-            "type": "string",
-            "description": "L'identifiant unique du parcours finalisé",
-            "example": "00f8e6fedc4cf8b5ace5a689"
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Date de création du résultat",
-            "format": "date-time",
-            "example": "2022-01-01T00:00:00Z"
-          }
-        }
       },
       "ResultatData": {
         "properties": {
@@ -1215,7 +1230,7 @@
             "type": "object",
             "description": "Le parcours finalisé",
             "properties": {
-              "id":{
+              "id": {
                 "type": "string",
                 "description": "Identifiant unique du parcours",
                 "example": "00f8e6fedc4cf8b5ace5a689"
@@ -1236,14 +1251,9 @@
           "trailID"
         ]
       },
-      "Trail": {
+      "BaseTrail": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du parcours",
-            "example": "00f8e6fedc4cf8b5ace5a689"
-          },
           "nom": {
             "type": "string",
             "description": "Nom du parcours",
@@ -1266,128 +1276,111 @@
             "type": "string",
             "description": "Descriptif du parcours",
             "example": "Ce parcours peut se faire en famille avec une poucette..."
-          },
-          "createdAt": {
-            "type": "string",
-            "description": "Date de création de l'utilisateur",
-            "format": "date-time",
-            "example": "2022-01-01T00:00:00Z"
-          },
-          "createdBy": {
-            "type": "string",
-            "description": "L'identifiant unique de la personne qui a créé le parcours",
-            "example": "7038e6fedc4cf8b5ace5a689"
-          },
-          "postesInclus": {
-            "type": "array",
-            "description": "La liste des postes qui sont dans le parcours",
-            "items": {
-              "type": "string"
-            },
-            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
           }
-        },
-        "required": [
-          "id",
-          "nom",
-          "difficulte",
-          "descr",
-          "createdAt",
-          "createdBy",
-          "postesInclus"
+        }
+      },
+      "Trail": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifiant unique du parcours",
+                "example": "00f8e6fedc4cf8b5ace5a689"
+              }
+            }
+          },
+          {
+            "$ref": "#/components/schemas/BaseTrail"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "description": "Date de création du parcours",
+                "format": "date-time",
+                "example": "2022-01-01T00:00:00Z"
+              },
+              "createdBy": {
+                "type": "string",
+                "description": "L'identifiant unique de la personne qui a créé le parcours",
+                "example": "7038e6fedc4cf8b5ace5a689"
+              },
+              "postesInclus": {
+                "type": "array",
+                "description": "La liste des postes qui sont dans le parcours",
+                "items": {
+                  "type": "string"
+                },
+                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+              }
+            }
+          }
         ]
       },
       "TrailData": {
-        "type": "object",
-        "properties": {
-          "nom": {
-            "type": "string",
-            "description": "Nom du parcours",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "Printemps 1"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseTrail"
           },
-          "difficulte": {
-            "type": "string",
-            "description": "Difficulté du parcours",
-            "enum": [
-              "facile",
-              "moyen",
-              "difficle",
-              "très difficle"
-            ],
-            "example": "facile"
-          },
-          "descr": {
-            "type": "string",
-            "description": "Descriptif du parcours",
-            "example": "Ce parcours peut se faire en famille avec une poucette..."
-          },
-          "postesInclus": {
-            "type": "array",
-            "description": "La liste des postes qui sont dans le parcours",
-            "items": {
-              "type": "string"
+          {
+            "type": "object",
+            "properties": {
+              "postesInclus": {
+                "type": "array",
+                "description": "La liste des postes qui sont dans le parcours",
+                "items": {
+                  "type": "string"
+                },
+                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+              }
             },
-            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+            "required": [
+              "postesInclus"
+            ]
           }
-        },
-        "required": [
-          "nom",
-          "difficulte",
-          "descr",
-          "postesInclus"
         ]
       },
       "PartialTrailData": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du parcours",
-            "example": "00f8e6fedc4cf8b5ace5a689"
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Identifiant unique du parcours",
+                "example": "00f8e6fedc4cf8b5ace5a689"
+              }
+            }
           },
-          "nom": {
-            "type": "string",
-            "description": "Nom du parcours",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "Printemps 1"
+          {
+            "$ref": "#/components/schemas/BaseTrail"
           },
-          "difficulte": {
-            "type": "string",
-            "description": "Difficulté du parcours",
-            "enum": [
-              "facile",
-              "moyen",
-              "difficle",
-              "très difficle"
-            ],
-            "example": "facile"
-          },
-          "descr": {
-            "type": "string",
-            "description": "Descriptif du parcours",
-            "example": "Ce parcours peut se faire en famille avec une poucette..."
-          },
-          "nbr_posts": {
-            "type": "integer",
-            "description": "Le nombre des postes qui sont dans le parcours",
-            "example": 2
-          },
-          "nomCreateur": {
-            "type": "string",
-            "description": "Nom de la personne qui a créé le parcours",
-            "example": "John"
+          {
+            "type": "object",
+            "properties": {
+              "nbr_posts": {
+                "type": "integer",
+                "description": "Le nombre des postes qui sont dans le parcours",
+                "example": 2
+              },
+              "nomCreateur": {
+                "type": "string",
+                "description": "Nom de la personne qui a créé le parcours",
+                "example": "John"
+              }
+            }
           }
-        }
+        ]
       },
       "TrailCreateResponse": {
         "type": "object",
         "allOf": [
           {
             "type": "object",
-            "properties" : {
+            "properties": {
               "id": {
                 "type": "string",
                 "description": "Identifiant unique du parcours",
@@ -1409,52 +1402,42 @@
               },
               "createdBy": {
                 "type": "object",
-                "allOf":[
-                { "$ref": "#/components/schemas/Person" }
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Person"
+                  }
                 ]
               }
             }
-          }]
+          }
+        ]
       },
       "TrailWithResults": {
+        "allOf": [
+          {
             "type": "object",
             "properties": {
               "id": {
-            "type": "string",
-            "description": "Identifiant unique du parcours",
-            "example": "00f8e6fedc4cf8b5ace5a689"
+                "type": "string",
+                "description": "Identifiant unique du parcours",
+                "example": "00f8e6fedc4cf8b5ace5a689"
+              }
+            }
           },
-          "nom": {
-            "type": "string",
-            "description": "Nom du parcours",
-            "minLength": 3,
-            "maxLength": 30,
-            "example": "Printemps 1"
+          {
+            "$ref": "#/components/schemas/BaseTrail"
           },
-          "difficulte": {
-            "type": "string",
-            "description": "Difficulté du parcours",
-            "enum": [
-              "facile",
-              "moyen",
-              "difficle",
-              "très difficle"
-            ],
-            "example": "facile"
-          },
-          "descr": {
-            "type": "string",
-            "description": "Descriptif du parcours",
-            "example": "Ce parcours peut se faire en famille avec une poucette..."
-          },
-          "postesInclus": {
-            "type": "array",
-            "description": "La liste des postes qui sont dans le parcours",
-            "items": {
-              "type": "string"
-            },
-            "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
-          },
+          {
+            "type": "object",
+            "properties": {
+              "postesInclus": {
+                "type": "array",
+                "description": "La liste des postes qui sont dans le parcours",
+                "items": {
+                  "type": "string"
+                },
+                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+              },
               "resultatsAct": {
                 "type": "array",
                 "items": {
@@ -1476,6 +1459,8 @@
                 }
               }
             }
+          }
+        ]
       }
     }
   }
