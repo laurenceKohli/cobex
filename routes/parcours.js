@@ -67,12 +67,6 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
         }
       },
       {
-        $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
-      },
-      {
-        $limit: pageLimit
-      },
-      {
         $unwind: '$user'
       },
       {
@@ -85,8 +79,14 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
         $sort: {
           temps: 1 // Trier par temps du plus petit au plus grand
         }
+      },
+      {
+        $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
+      },
+      {
+        $limit: pageLimit
       }
-    );
+     );
   
     let include = false;
     if (req.query) {
