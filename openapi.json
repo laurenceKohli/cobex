@@ -103,34 +103,6 @@
             "description": "Liste des utilisateurs récupérée avec succès",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "oneOf": [
-                      {
-                        "description": "Réponse sans le paramètre `include`",
-                        "$ref": "#/components/schemas/BasePerson"
-                      },
-                      {
-                        "description": "Réponse avec le paramètre `include=role`",
-                        "allOf": [
-                          {
-                            "$ref": "#/components/schemas/BasePerson"
-                          },
-                          {
-                            "type": "object",
-                            "properties": {
-                              "role": {
-                                "type": "string",
-                                "example": "admin"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                },
                 "examples": {
                   "withoutInclude": {
                     "summary": "Sans paramètre de requête",
@@ -503,7 +475,8 @@
               ],
               "example": "postes"
             }
-          }, {
+          },
+          {
             "name": "page",
             "in": "query",
             "description": "Numéro de page (4 postes par page)",
@@ -518,16 +491,6 @@
             "description": "Liste des utilisateurs récupérée avec succès",
             "content": {
               "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "description": "Réponse sans paramètres"
-                    },
-                    {
-                      "description": "Réponse avec tous les paramètres `include=postes&page=3`"
-                    }
-                  ]
-                },
                 "examples": {
                   "withoutInclude": {
                     "summary": "Sans paramètre de requête",
@@ -774,7 +737,15 @@
             }
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
+          },
+          "500": {
+            "description": "Résultat invalide",
+            "content": {
+              "text/html": {
+                "example": "Resultat validation failed: trailID: Path `trailID` is required."
+              }
+            }
           }
         }
       },
@@ -818,19 +789,55 @@
               "enum": [
                 "utilisateurs",
                 "parcours"
-              ]
+              ],
+              "example": "parcours"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Liste des résultats",
+            "description": "Liste des utilisateurs récupérée avec succès",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ResultatPartialData"
+                "examples": {
+                  "withoutInclude": {
+                    "summary": "Sans paramètres de requête",
+                    "value": {
+                      "data": [
+                        {
+                          "id": "678504c0224b7e662ab9620a",
+                          "temps": 120
+                        },
+                        {
+                          "id": "678504c0224b7e662ab9620b",
+                          "temps": 130
+                        },{
+                          "id": "678504c0224b7e662ab9620c",
+                          "temps": 200
+                      }
+                      ]
+                    }
+                  },
+                  "withInclude": {
+                    "summary": "Avec paramètre `utilisateurs=678504c0224b7e662ab961e6&include=parcours`",
+                    "value": {
+                      "data": [
+                          {
+                              "id": "678504c0224b7e662ab9620a",
+                              "temps": 120,
+                              "parcours": {
+                                  "id": "678504c0224b7e662ab961ff",
+                                  "nom": "Parcours moyen"
+                              }
+                          },
+                          {
+                              "id": "678504c0224b7e662ab9620c",
+                              "temps": 200,
+                              "parcours": {
+                                  "id": "678504c0224b7e662ab961ff",
+                                  "nom": "Parcours moyen"
+                              }
+                          }]}
                   }
                 }
               }
@@ -906,7 +913,7 @@
         }
       ],
       "delete": {
-        "summary": "Supprimer un résultat, lors de la suppression du parcours",
+        "summary": "Supprimer un résultat, lors de la suppression du parcours (uniquement accessible aux rôles admin et superAdmin)",
         "tags": [
           "resultats"
         ],
@@ -923,7 +930,7 @@
             "$ref": "#/components/responses/NotID"
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -1308,11 +1315,6 @@
             "exclusiveMinimum": true,
             "example": "600"
           },
-          "userID": {
-            "type": "string",
-            "description": "L'identifiant unique de la personne qui a fait ce temps",
-            "example": "7038e6fedc4cf8b5ace5a689"
-          },
           "trailID": {
             "type": "string",
             "description": "L'identifiant unique du parcours finalisé",
@@ -1321,7 +1323,6 @@
         },
         "required": [
           "temps",
-          "userID",
           "trailID"
         ]
       },
