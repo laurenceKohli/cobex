@@ -41,6 +41,7 @@
           "utilisateurs"
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -135,11 +136,11 @@
                     "summary": "Sans paramètre de requête",
                     "value": [
                       {
-                        "id": 1,
-                        "name": "Alice"
+                        "id": "7038e6fedc4cf8b5ace5a689",
+                        "name": "John"
                       },
                       {
-                        "id": 2,
+                        "id": "7038e6fedc4cf8b5ace5a6823",
                         "name": "Bob"
                       }
                     ]
@@ -148,14 +149,14 @@
                     "summary": "Avec paramètre `include=role`",
                     "value": [
                       {
-                        "id": 1,
-                        "name": "Alice",
-                        "role": "admin"
+                        "id": "7038e6fedc4cf8b5ace5a689",
+                        "name": "John",
+                        "role": "utilisateur"
                       },
                       {
-                        "id": 2,
+                        "id": "7038e6fedc4cf8b5ace5a6823",
                         "name": "Bob",
-                        "role": "utilisateur"
+                        "role": "admin"
                       }
                     ]
                   }
@@ -216,6 +217,7 @@
           "utilisateurs"
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
@@ -314,6 +316,7 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "description": "Indique si le poste est accessible actuellement",
@@ -377,7 +380,7 @@
     },
     "/parcours": {
       "post": {
-        "summary": "Créer un nouveau parcours",
+        "summary": "Créer un nouveau parcours (uniquement accessible aux rôles admin et superAdmin)",
         "tags": [
           "parcours"
         ],
@@ -403,7 +406,8 @@
               "Location": {
                 "description": "URL du nouveau parcours",
                 "schema": {
-                  "type": "string"
+                  "type": "string",
+                  "example": "http://localhost:4000;/api/parcours/00f8e6fedc4cf8b5ace5a689"
                 }
               }
             },
@@ -419,10 +423,18 @@
             }
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "description": "Parcours invalide",
+            "content": {
+              "text/html": {
+                "example": "Trail validation failed : nom: Parcours 1 already exists"
+              }
+            }
           }
         }
       },
@@ -435,12 +447,13 @@
           {
             "name": "include",
             "in": "query",
-            "description": "Inclure des informations supplémentaires (user)",
+            "description": "Inclure des informations supplémentaires (nom du créateur)",
             "schema": {
               "type": "string",
               "enum": [
                 "user"
-              ]
+              ],
+              "example": "user"
             }
           }
         ],
@@ -482,22 +495,116 @@
           {
             "name": "include",
             "in": "query",
-            "description": "Inclure les résultats (postes)",
+            "description": "Inclure 4 résultats et les informations sur les postes",
             "schema": {
               "type": "string",
               "enum": [
                 "postes"
-              ]
+              ],
+              "example": "postes"
+            }
+          }, {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de page (4 postes par page)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Parcours récupéré avec succès",
+            "description": "Liste des utilisateurs récupérée avec succès",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TrailWithResults"
+                  "oneOf": [
+                    {
+                      "description": "Réponse sans paramètres"
+                    },
+                    {
+                      "description": "Réponse avec tous les paramètres `include=postes&page=3`"
+                    }
+                  ]
+                },
+                "examples": {
+                  "withoutInclude": {
+                    "summary": "Sans paramètre de requête",
+                    "value": {
+                      "id": "678504c0224b7e662ab961ff",
+                      "nom": "Parcours Facile"
+                    }
+                  },
+                  "withInclude": {
+                    "summary": "Avec paramètre `include=postes&page=3`",
+                    "value": {
+                      "id": "678504c0224b7e662ab961ff",
+                      "nom": "Parcours Facile",
+                      "difficulte": "facile",
+                      "descr": "Un parcours facile pour les débutants.",
+                      "postesInclus": [
+                        {
+                          "geoloc": {
+                            "lat": 46.780534,
+                            "long": 6.642302,
+                            "_id": "678504c0224b7e662ab961f5",
+                            "id": "678504c0224b7e662ab961f5"
+                          },
+                          "number": 30,
+                          "estAccessible": true,
+                          "images": [
+                            "https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_15.jpg"
+                          ],
+                          "descr": "Poste 1 (au coin de la Banque)",
+                          "code": "30bda",
+                          "createdAt": "2025-01-13T12:19:12.605Z",
+                          "id": "678504c0224b7e662ab961f4"
+                        },
+                        {
+                          "geoloc": {
+                            "lat": 46.780906,
+                            "long": 6.643686,
+                            "_id": "678504c0224b7e662ab961f7",
+                            "id": "678504c0224b7e662ab961f7"
+                          },
+                          "number": 31,
+                          "estAccessible": true,
+                          "images": [
+                            "https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_22.jpg",
+                            "https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_04.jpg"
+                          ],
+                          "descr": "Poste 2 (sur le pont)",
+                          "code": "31ert",
+                          "createdAt": "2025-01-13T12:19:12.605Z",
+                          "id": "678504c0224b7e662ab961f6"
+                        }
+                      ],
+                      "resultatsAct": [
+                        {
+                          "_id": "678504c0224b7e662ab9620f",
+                          "temps": 190,
+                          "user": "Jane Doe"
+                        },
+                        {
+                          "_id": "678504c0224b7e662ab9620c",
+                          "temps": 200,
+                          "user": "Mary Doe"
+                        },
+                        {
+                          "_id": "678504c0224b7e662ab96213",
+                          "temps": 200,
+                          "user": "Jane Doe"
+                        },
+                        {
+                          "_id": "678504c0224b7e662ab96212",
+                          "temps": 210,
+                          "user": "Mary Doe"
+                        }
+                      ],
+                      "nombrePages": 3
+                    }
+                  }
                 }
               }
             }
@@ -511,7 +618,7 @@
         }
       },
       "put": {
-        "summary": "Modifier un parcours (remplacement complet)",
+        "summary": "Modifier un parcours complet (accessible uniquement au créateur du parcours (admin) et aux superAdmin)",
         "tags": [
           "parcours"
         ],
@@ -545,15 +652,23 @@
             "$ref": "#/components/responses/NotID"
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "500": {
+            "description": "Parcours invalide",
+            "content": {
+              "text/html": {
+                "example": "Trail validation failed : nom: Printemps 1 already exists"
+              }
+            }
           }
         }
       },
       "patch": {
-        "summary": "Modifier partiellement un parcours",
+        "summary": "Modifier partiellement un parcours (accessible uniquement au créateur du parcours (admin) et aux superAdmin)",
         "tags": [
           "parcours"
         ],
@@ -567,7 +682,13 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TrailData"
+                "properties": {
+                  "nom": {
+                    "type": "string",
+                    "description": "Nom du parcours",
+                    "example": "Parcours 1"
+                  }
+                }
               }
             }
           }
@@ -587,7 +708,7 @@
             "$ref": "#/components/responses/NotID"
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
@@ -595,7 +716,7 @@
         }
       },
       "delete": {
-        "summary": "Supprimer un parcours",
+        "summary": "Supprimer un parcours (accessible uniquement au créateur du parcours (admin) et aux superAdmin)",
         "tags": [
           "parcours"
         ],
@@ -612,13 +733,10 @@
             "$ref": "#/components/responses/NotID"
           },
           "401": {
-            "$ref": "#/components/responses/Unauthorized"
+            "$ref": "#/components/responses/NotConnected"
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1314,7 +1432,10 @@
                 "items": {
                   "type": "string"
                 },
-                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+                "example": [
+                  "d038e6fedc4cf8b5ace5a689",
+                  "d027e6fedc4cf8b5ace5a646"
+                ]
               }
             }
           }
@@ -1334,7 +1455,10 @@
                 "items": {
                   "type": "string"
                 },
-                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+                "example": [
+                  "d038e6fedc4cf8b5ace5a689",
+                  "d027e6fedc4cf8b5ace5a646"
+                ]
               }
             },
             "required": [
@@ -1365,11 +1489,6 @@
                 "type": "integer",
                 "description": "Le nombre des postes qui sont dans le parcours",
                 "example": 2
-              },
-              "nomCreateur": {
-                "type": "string",
-                "description": "Nom de la personne qui a créé le parcours",
-                "example": "John"
               }
             }
           }
@@ -1436,7 +1555,10 @@
                 "items": {
                   "type": "string"
                 },
-                "example": "[d038e6fedc4cf8b5ace5a689, d027e6fedc4cf8b5ace5a646]"
+                "example": [
+                  "d038e6fedc4cf8b5ace5a689",
+                  "d027e6fedc4cf8b5ace5a646"
+                ]
               },
               "resultatsAct": {
                 "type": "array",
