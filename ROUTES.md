@@ -33,7 +33,7 @@ POST /api/utilisateurs
 
 PATCH /api/utilisateurs/:id  ((a faire en dernier))
 
-DELETE /api/utilisateurs/:id ((a faire en dernier))
+DELETE /api/utilisateurs/:id ((a faire en dernier)) -> anonymise les résultats de l'utilisateur
 
 ## parcours.js
 GET /api/parcours/ -> uniquement les id, nom, difficulté, descr, nbre postes
@@ -54,8 +54,6 @@ GET /api/resultats?utilisateurs=:id&?include=parcours
 GET /api/resultats?parcours=:id&?include=utilisateurs
 
 POST /api/resultats
-
-PATCH /api/resultats/:userId
 
 ## postes.js
 GET /api/postes

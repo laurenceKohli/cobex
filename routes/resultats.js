@@ -51,23 +51,4 @@ router.post("/", utils.requireJson, Authorise(true), function (req, res, next) {
     .catch(next);
 });
 
-router.patch("/:userId", utils.VerifyID, Authorise(true), function (req, res, next) {
-  if (req.currentUserRole !== "superAdmin" && req.currentUser.id !== req.params.userId) {
-    return res.status(403).send("Forbidden");
-  }
-  //else
-  const query = Resultat.find({ userID: req.params.userId })
-  query.exec()
-    .then(resultats => {
-      return Promise.all(resultats.map(resultat => {
-        resultat.userID = config.anonymousUserId;
-        return resultat.save()
-      }))
-        .then((savedResultats) => {
-          return res.status(204).send(savedResultats);
-        })
-    })
-    .catch(next);
-});
-
 export default router;

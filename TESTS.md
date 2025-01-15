@@ -20,7 +20,6 @@ GET /api/utilisateurs?include=isAdmin
 2. `GET /api/resultats`
    - `should retrieve the list of resultats`
 TODO
-PATCH
 GET /api/resultats?utilisateurs=:id
 GET /api/resultats?utilisateurs=:id&parcours=:id
 ## poste-spec.js
