@@ -223,7 +223,7 @@ router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next)
           Resultat.findByIdAndDelete(resultat._id).exec()
         })
       })
-      Parcours.findByIdAndDelete(req.params.id).exec()
+      Parcours.findByIdAndDelete(req.params?.id).exec()
         .then((parcours) => {
           if (parcours) {
             return res.status(204).send();
