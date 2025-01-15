@@ -57,8 +57,6 @@ POST /api/resultats
 
 PATCH /api/resultats/:userId
 
-DELETE /api/resultats?parcours=:id
-
 ## postes.js
 GET /api/postes
 GET /api/postes/:id 

@@ -21,9 +21,8 @@ GET /api/utilisateurs?include=isAdmin
    - `should retrieve the list of resultats`
 TODO
 PATCH
-DELETE
-GET /api/resultats?utilisateurs=:id&?include=parcours
-GET /api/resultats?parcours=:id&?include=utilisateurs
+GET /api/resultats?utilisateurs=:id
+GET /api/resultats?utilisateurs=:id&parcours=:id
 ## poste-spec.js
 1. `GET /api/postes`
    - `should retrieve the list of postes`

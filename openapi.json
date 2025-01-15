@@ -679,7 +679,7 @@
         }
       },
       "delete": {
-        "summary": "Supprimer un parcours (accessible uniquement au créateur du parcours (admin) et aux superAdmin)",
+        "summary": "Supprimer un parcours et les résultats associés (accessible uniquement au créateur du parcours (admin) et aux superAdmin)",
         "tags": [
           "parcours"
         ],
@@ -866,47 +866,6 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
-          }
-        }
-      }
-    },
-    "/resultats/{id}": {
-      "parameters": [
-        {
-          "name": "id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "string"
-          },
-          "description": "ID de l'utilisateur à récupérer"
-        }
-      ],
-      "delete": {
-        "summary": "Supprimer un résultat, lors de la suppression du parcours (uniquement accessible aux rôles admin et superAdmin)",
-        "tags": [
-          "resultats"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Résultat supprimé avec succès"
-          },
-          "400": {
-            "$ref": "#/components/responses/NotID"
-          },
-          "401": {
-            "$ref": "#/components/responses/NotConnected"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound"
           }
         }
       }

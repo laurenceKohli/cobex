@@ -70,20 +70,4 @@ router.patch("/:userId", utils.VerifyID, Authorise(true), function (req, res, ne
     .catch(next);
 });
 
-router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next) {
-  if (req.currentUserRole !== "superAdmin" && req.currentUserRole !== "admin") {
-    return res.status(403).send("Forbidden");
-  }
-  //else
-  Resultat.findByIdAndDelete(req.params.id).exec()
-    .then(resultat => {
-      if (resultat) {
-        return res.status(204).send();
-      }
-      //else
-      return res.status(404).send("Resultat not found");
-    })
-    .catch(next);
-});
-
 export default router;
