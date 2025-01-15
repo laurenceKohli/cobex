@@ -700,6 +700,9 @@
           },
           "403": {
             "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           }
         }
       }
@@ -1227,7 +1230,11 @@
             "description": "Descriptif du parcours",
             "example": "Ce parcours peut se faire en famille avec une poucette..."
           }
-        }
+        },
+        "required": [
+          "nom",
+          "difficulte"
+        ]
       },
       "Trail": {
         "allOf": [
