@@ -37,11 +37,12 @@ export function createAdminUser(){
 export function createPoste(){
   return Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '31',
-        images: ['image1']
+        number: 31,
+        images: ['https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_11.jpg'],
+        code: '31ert'
     })
 }
 
@@ -49,20 +50,22 @@ export function create2Postes(){
   return Promise.all([
     Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '32',
-        images: ['image2']
+        number: 32,
+        images: ['https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_11.jpg'],
+        code: '32qwe'
     }),
     Poste.create({
         geoloc: {
-            "lat": 123467,
-            "long": 128432
+            "lat": 46.780906,
+            "long": 6.643686
         },
-        number: '33',
-        images: ['image1', 'image2'],
-        descr: "test"
+        number: 33,
+        images: ['https://commons.wikimedia.org/wiki/File:For%C3%AAt_de_Tusson,_11.jpg'],
+        descr: "test",
+        code: '33qwe'
     })
   ]);
 }
@@ -80,18 +83,32 @@ export async function createParcours(userId){
     postesInclus: [poste1.id, poste2.id]
 });
 }
-
-export async function createParcoursWithResult(){
-  const resultat = await createResultat();
-  return Parcours.findById(resultat.trailID);
+async function createResultats(parcours){
+  const user = await createUser()
+  for(let i = 0; i < 6; i++){
+    await Resultat.create({
+        trailID: parcours.id,
+        userID: user.id,
+        temps: 130
+    });
+  }
+  return true;
+}
+export async function createParcoursWithResults(){
+  const user = await createAdminUser();
+  const parcours = await createParcours(user.id);
+  const resultats = await createResultats(parcours);
+  return parcours;
  }
 
 export async function createResultat(){
-  const user = await createUser();
+  const user = await createAdminUser();
   const parcours = await createParcours(user.id);
   return Resultat.create({
     trailID: parcours.id,
     userID: user.id,
     temps: 120
 });
+
+
 }

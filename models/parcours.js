@@ -38,7 +38,12 @@ const parcoursSchema = new Schema({
         required: true,
     },
     postesInclus: {
-        type: Array,
+        type: [
+             {
+            type : mongoose.Schema.Types.ObjectId,
+            ref : "Poste"
+            }
+        ],
         required: true,
         validate:
         [

@@ -36,6 +36,10 @@ const posteSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    code : {
+        type: String,
+        required: true,
     }
 });
 

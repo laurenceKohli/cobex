@@ -26,14 +26,14 @@ Delete -> si parcours est supprimer
 # REST
 ## utilisateurs.js
 GET /api/utilisateurs -> uniquement nom et id
-GET /api/utilisateurs?include=isAdmin -> affichable que par le Superadmin
+GET /api/utilisateurs?include=role -> affichable que par le Superadmin
 GET /api/utilisateurs/:id
 
 POST /api/utilisateurs
 
 PATCH /api/utilisateurs/:id  ((a faire en dernier))
 
-DELETE /api/utilisateurs/:id ((a faire en dernier))
+DELETE /api/utilisateurs/:id ((a faire en dernier)) -> anonymise les résultats de l'utilisateur
 
 ## parcours.js
 GET /api/parcours/ -> uniquement les id, nom, difficulté, descr, nbre postes
@@ -54,10 +54,6 @@ GET /api/resultats?utilisateurs=:id&?include=parcours
 GET /api/resultats?parcours=:id&?include=utilisateurs
 
 POST /api/resultats
-
-PATCH /api/resultats/:userId
-
-DELETE /api/resultats?parcours=:id
 
 ## postes.js
 GET /api/postes

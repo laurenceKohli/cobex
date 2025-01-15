@@ -5,6 +5,8 @@ import * as config from '../config.js';
 import * as utils from "./utils.js";
 import { Authorise } from "./auth.js";
 import Poste from "../models/poste.js";
+import e from "express";
+import { configDotenv } from "dotenv";
 
 const router = express.Router();
 
@@ -28,6 +30,7 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
   const query = Poste.findById(req.params.id)
   query.exec()
   .then(poste => {
+    if(poste){
     res.send(
       {
         id: poste._id,
@@ -36,35 +39,34 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
         images: poste.images,
         estAccessible: poste.estAccessible,
         descr: poste.descr,
+        code: poste.code
       }
-    );
+    );} 
+      else {
+        res.status(404).send("Poste not found");
+    }
   })
   
   .catch(next);
 });
 
-router.patch("/", utils.requireJson, Authorise(true),  function (req, res, next) {
+router.patch("/:id", utils.requireJson, Authorise(true),  function (req, res, next) {
   if (req.currentUserRole !== "superAdmin") {
     return res.status(403).send("Forbidden");
   }
 
-  if (!req.body.id) {
-    return res.status(400).send("Missing id")
-    .catch(next);
-  }
-
-  const query = Poste.findById(req.body.id)
+  const query = Poste.findById(req.params.id)
   query.exec()
   .then(poste => {
-    if (req.body.geoloc) {
-      poste.geoloc = req.body.geoloc;
+    if (req.body.estAccessible) {
+      poste.estAccessible = req.body.estAccessible;
       poste.save()
       .then((savedPost) => {
         res.status(200).send(savedPost);
       })
       .catch(next);
     } else {
-      return res.status(400).send("Missing geoloc");
+      return res.status(400).send("No data to update");
     }
   })
 });

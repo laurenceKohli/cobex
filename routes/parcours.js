@@ -8,6 +8,8 @@ import Resultat from "../models/resultat.js";
 import Utilisateur from "../models/utilisateur.js";
 import { Authorise } from "./auth.js";
 
+const pageLimit = 4;
+
 const router = express.Router();
 
 router.get("/", function (req, res, next) {
@@ -76,6 +78,12 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
       $sort: {
         temps: 1 // Trier par temps du plus petit au plus grand
       }
+    },
+    {
+      $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
+    },
+    {
+      $limit: pageLimit
     }
   );
 
@@ -83,38 +91,45 @@ router.get("/:id", utils.VerifyID, function (req, res, next) {
   if (req.query) {
     include = req.query.include;
   }
-  const query = Parcours.findById(req.params.id)
-  query.exec()
-    .then(parcours => {
-      if (parcours === null) {
-        return res.status(404).send("Parcours not found");
-      }
+  Resultat.find({ trailID: req.params.id }).countDocuments().then(total => {
+    const query = Parcours.findById(req.params.id)
+    query.populate("postesInclus");
+    query.exec()
+      .then(parcours => {
 
-      if (include?.includes("postes")) {
-        Resultat.aggregate(pipeline)
-          .exec()
-          .then(resultats => {
-            res.status(200).send(
-              {
-                id: parcours._id,
-                nom: parcours.nom,
-                difficulte: parcours.difficulte,
-                descr: parcours.descr,
-                postesInclus: parcours.postesInclus,
-                resultatsAct: resultats
-              }
-            )
-          })
-          .catch(next);
-      } else {
-      res.status(200).send(
-        {
-          id: parcours._id,
-          nom: parcours.nom,
+        if (parcours === null) {
+          return res.status(404).send("Parcours not found");
         }
-      )}
-    })
-    .catch(next);
+
+        if (include?.includes("postes")) {
+          Resultat.aggregate(pipeline)
+            .exec()
+            .then(resultats => {
+              res.status(200).send(
+                {
+                  id: parcours._id,
+                  nom: parcours.nom,
+                  difficulte: parcours.difficulte,
+                  descr: parcours.descr,
+                  postesInclus: parcours.postesInclus,
+                  resultatsAct: resultats,
+                  nombrePages: Math.ceil(total / pageLimit)
+                }
+              )
+            })
+            .catch(next);
+        } else {
+          res.status(200).send(
+            {
+              id: parcours._id,
+              nom: parcours.nom,
+            }
+          )
+        }
+      })
+      .catch(next);
+
+  })
 });
 
 router.post("/", utils.requireJson, Authorise(true), function (req, res, next) {
@@ -137,7 +152,7 @@ router.post("/", utils.requireJson, Authorise(true), function (req, res, next) {
 router.put("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function (req, res, next) {
   Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && chemin.createBy !== req.currentUser) {
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
         return res.status(403).send("Forbidden");
       } else {
         chemin.nom = req.body.nom;
@@ -153,11 +168,11 @@ router.put("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function 
     .catch(next);
 });
 
-router.patch("/:id", utils.requireJson, Authorise(true), function (req, res, next) {
+router.patch("/:id", utils.VerifyID, utils.requireJson, Authorise(true), function (req, res, next) {
   Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && chemin.createBy !== req.currentUser) {
-        return res.status(403).send("Forbidden");
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
+        return res.status(403).send("Forbidden" + chemin.createBy + req.currentUser);
       } else {
         if (req.body.nom) chemin.nom = req.body.nom;
         if (req.body.difficulte) chemin.difficulte = req.body.difficulte;
@@ -173,15 +188,43 @@ router.patch("/:id", utils.requireJson, Authorise(true), function (req, res, nex
 });
 
 router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next) {
-  Parcours.findById(req.params.id).populate("createBy").exec()
+  Parcours.findById(req.params.id).exec()
     .then(chemin => {
-      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser)) {
-        console.log(chemin.createBy)
-        console.log(req.currentUser)
+      if (req.currentUserRole !== "superAdmin" && JSON.stringify(chemin.createBy) != JSON.stringify(req.currentUser._id)) {
         return res.status(403).send("Forbidden");
       }
       //else
-      Parcours.findByIdAndDelete(req.params.id).exec()
+      const pipeline = [];
+      pipeline.push(
+        {
+          $match: {
+            "trailID": new mongoose.Types.ObjectId(req.params.id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'utilisateurs',
+            localField: 'userID',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $unwind: '$user'
+        },
+        {
+          $project: {
+            temps: 1,
+            user: '$user.nom'
+          }
+        }
+      )
+      Resultat.aggregate(pipeline).exec().then(resultats => {
+        resultats.forEach(resultat => {
+          Resultat.findByIdAndDelete(resultat._id).exec()
+        })
+      })
+      Parcours.findByIdAndDelete(req.params?.id).exec()
         .then((parcours) => {
           if (parcours) {
             return res.status(204).send();

@@ -21,6 +21,23 @@ describe('POST /api/utilisateurs', function() {
     });
 });
 
+describe('POST /api/utilisateurs', function() {
+    it('should return error name already exists', async function() {
+        // Create a user in the database before test in this block.
+        await createUser();
+
+        const response = await supertest(app)
+            .post('/api/utilisateurs')
+            .send({
+                nom: 'Jane Doe',
+                mail: 'test@email.com',
+                mdp: 'password'
+            })
+        expect(response.status).toBe(400);
+        expect(response.body.msg).toBe('Utilisateur validation failed: nom: Person Jane Doe already exists §§usernameExists§§');
+    });
+});
+
 describe('GET /api/utilisateurs', function() {
     it('should retrieve the list of users', async function() {        
         // Create a user in the database before test in this block.
@@ -51,11 +68,13 @@ describe('GET /api/utilisateurs/:id', function() {
         const response2 = await supertest(app)
             .get('/api/utilisateurs/675acf94c22b546fcde7794d')
         expect(response2.status).toBe(404);
+        expect(response2.text).toBe('Person not found');
 
         // id qui n'en est pas un
         const response3 = await supertest(app)
             .get('/api/utilisateurs/675')
         expect(response3.status).toBe(400);
+        expect(response3.text).toBe('Invalid ID');
 
     });
 });
@@ -74,7 +93,7 @@ describe('POST /api/utilisateurs/login', function() {
                 mdp: 'password'
             })
         expect(response1.status).toBe(200);
-        expect(response1.body.message).toBe('Welcome Jane Doe!');
+        expect(response1.body.message).toBe('Bienvenue Jane Doe!');
         expect(!response1.body.mdp);
 
         //invalid password
@@ -85,6 +104,7 @@ describe('POST /api/utilisateurs/login', function() {
                 mdp: 'mdp13'
             })
         expect(response2.status).toBe(401);
+        expect(response2.text).toBe('Unauthorized');
 
         //invalid name
         const response3 = await supertest(app)
@@ -94,6 +114,7 @@ describe('POST /api/utilisateurs/login', function() {
                 mdp: 'mdp12'
             })
         expect(response3.status).toBe(401);
+        expect(response3.text).toBe('Unauthorized');
     });
 });
 

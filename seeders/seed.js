@@ -14,7 +14,7 @@ function seed() {
     })
     .then(({ users, postes }) => {
       const postesID = postes.map(poste => poste._id);
-      return seedParcours(users[0]._id, postesID).then(parcours => ({ users, parcours }));
+      return seedParcours(users[1]._id, postesID).then(parcours => ({ users, parcours }));
     })
     .then(({ users, parcours }) => {
       const parcoursID = parcours.map(parcour => parcour._id);
