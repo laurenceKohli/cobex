@@ -193,7 +193,37 @@ router.delete("/:id", utils.VerifyID, Authorise(true), function (req, res, next)
         return res.status(403).send("Forbidden");
       }
       //else
-      Parcours.findByIdAndDelete(req.params.id).exec()
+      const pipeline = [];
+      pipeline.push(
+        {
+          $match: {
+            "trailID": new mongoose.Types.ObjectId(req.params.id)
+          }
+        },
+        {
+          $lookup: {
+            from: 'utilisateurs',
+            localField: 'userID',
+            foreignField: '_id',
+            as: 'user'
+          }
+        },
+        {
+          $unwind: '$user'
+        },
+        {
+          $project: {
+            temps: 1,
+            user: '$user.nom'
+          }
+        }
+      )
+      Resultat.aggregate(pipeline).exec().then(resultats => {
+        resultats.forEach(resultat => {
+          Resultat.findByIdAndDelete(resultat._id).exec()
+        })
+      })
+      Parcours.findByIdAndDelete(req.params?.id).exec()
         .then((parcours) => {
           if (parcours) {
             return res.status(204).send();
