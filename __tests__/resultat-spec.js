@@ -43,9 +43,9 @@ describe('GET /api/resultats', function () {
         const response = await supertest(app)
             .get('/api/resultats')
         expect(response.status).toBe(200);
-        expect(response.body.data.length).toBe(6);
-        expect(response.body.data[0].temps).toBe(130);
-        expect(!response.body.data[0].utilisateur);
+        expect(response.body.length).toBe(6);
+        expect(response.body[0].temps).toBe(130);
+        expect(!response.body[0].utilisateur);
     });
 });
 
