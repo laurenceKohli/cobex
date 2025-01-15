@@ -815,60 +815,6 @@
           }
         }
       }
-    },
-    "/resultats/{userId}": {
-      "patch": {
-        "summary": "Anonymiser les résultats d'un utilisateur, lors de la suppression de son compte",
-        "tags": [
-          "resultats"
-        ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Résultats anonymisés avec succès",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Resultat"
-                  },
-                  "exemple": {
-                    "id": "6cf8e6fedc4cf8b5ace5a689",
-                    "temps": 600,
-                    "userID": "6cf8e6fedc4cf8b5ace5a61234",
-                    "trailID": "00f8e6fedc4cf8b5ace5a689",
-                    "createdAt": "2022-01-01T00:00:00Z"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/NotID"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden"
-          }
-        }
-      }
     }
   },
   "components": {
@@ -1255,50 +1201,6 @@
           "trailID"
         ]
       },
-      "ResultatPartialData": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Identifiant unique du résultat",
-            "example": "6cf8e6fedc4cf8b5ace5a689"
-          },
-          "temps": {
-            "type": "integer",
-            "description": "Temps en secondes mis pour faire le parcours",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "example": "600"
-          },
-          "utilisateur": {
-            "type": "string",
-            "description": "Le nom de la personne qui a fait ce temps",
-            "example": "John"
-          },
-          "parcours": {
-            "type": "object",
-            "description": "Le parcours finalisé",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "Identifiant unique du parcours",
-                "example": "00f8e6fedc4cf8b5ace5a689"
-              },
-              "nom": {
-                "type": "string",
-                "description": "Nom du parcours",
-                "minLength": 3,
-                "maxLength": 30,
-                "example": "Printemps 1"
-              }
-            }
-          }
-        },
-        "required": [
-          "temps",
-          "userID",
-          "trailID"
-        ]
-      },
       "BaseTrail": {
         "type": "object",
         "properties": {
@@ -1456,59 +1358,6 @@
                     "$ref": "#/components/schemas/Person"
                   }
                 ]
-              }
-            }
-          }
-        ]
-      },
-      "TrailWithResults": {
-        "allOf": [
-          {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "description": "Identifiant unique du parcours",
-                "example": "00f8e6fedc4cf8b5ace5a689"
-              }
-            }
-          },
-          {
-            "$ref": "#/components/schemas/BaseTrail"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "postesInclus": {
-                "type": "array",
-                "description": "La liste des postes qui sont dans le parcours",
-                "items": {
-                  "type": "string"
-                },
-                "example": [
-                  "d038e6fedc4cf8b5ace5a689",
-                  "d027e6fedc4cf8b5ace5a646"
-                ]
-              },
-              "resultatsAct": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "_id": {
-                      "type": "String",
-                      "example": "6cf8e6fedc4cf8b5ace5a689"
-                    },
-                    "temps": {
-                      "type": "integer",
-                      "example": 600
-                    },
-                    "user": {
-                      "type": "string",
-                      "example": "John"
-                    }
-                  }
-                }
               }
             }
           }
