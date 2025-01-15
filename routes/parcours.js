@@ -50,83 +50,84 @@ router.get("/", function (req, res, next) {
 
 router.get("/:id", utils.VerifyID, function (req, res, next) {
   //permet d'ajouter les resultats des utilisateurs sur le parcours (avec leurs noms)
-  Resultat.find({ trailID: req.params.id }).countDocuments().then(total=> {
-    const pipeline = [];
-    pipeline.push(
-      {
-        $match: {
-          "trailID": new mongoose.Types.ObjectId(req.params.id)
-        }
-      },
-      {
-        $lookup: {
-          from: 'utilisateurs',
-          localField: 'userID',
-          foreignField: '_id',
-          as: 'user'
-        }
-      },
-      {
-        $unwind: '$user'
-      },
-      {
-        $project: {
-          temps: 1,
-          user: '$user.nom'
-        }
-      },
-      {
-        $sort: {
-          temps: 1 // Trier par temps du plus petit au plus grand
-        }
-      },
-      {
-        $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
-      },
-      {
-        $limit: pageLimit
+  const pipeline = [];
+  pipeline.push(
+    {
+      $match: {
+        "trailID": new mongoose.Types.ObjectId(req.params.id)
       }
-     );
-  
-    let include = false;
-    if (req.query) {
-      include = req.query.include;
+    },
+    {
+      $lookup: {
+        from: 'utilisateurs',
+        localField: 'userID',
+        foreignField: '_id',
+        as: 'user'
+      }
+    },
+    {
+      $unwind: '$user'
+    },
+    {
+      $project: {
+        temps: 1,
+        user: '$user.nom'
+      }
+    },
+    {
+      $sort: {
+        temps: 1 // Trier par temps du plus petit au plus grand
+      }
+    },
+    {
+      $skip: req.query.page ? (req.query.page - 1) * pageLimit : 0
+    },
+    {
+      $limit: pageLimit
     }
+  );
+
+  let include = false;
+  if (req.query) {
+    include = req.query.include;
+  }
+  Resultat.find({ trailID: req.params.id }).countDocuments().then(total => {
     const query = Parcours.findById(req.params.id)
     query.populate("postesInclus");
     query.exec()
-    .then(parcours => {
-      
-      if (parcours === null) {
-        return res.status(404).send("Parcours not found");
-      }
-  
-      if (include?.includes("postes")) {
-        Resultat.aggregate(pipeline)
-          .exec()
-          .then(resultats => {
-            res.status(200).send(
-              {
-                id: parcours._id,
-                nom: parcours.nom,
-                difficulte: parcours.difficulte,
-                descr: parcours.descr,
-                postesInclus: parcours.postesInclus,
-                resultatsAct: resultats,
-                nombrePages: Math.ceil(total/pageLimit)
-              }
-            )
-          })
-          .catch(next);
-      } else {
-      res.status(200).send(
-        {
-          id: parcours._id,
-          nom: parcours.nom,
+      .then(parcours => {
+
+        if (parcours === null) {
+          return res.status(404).send("Parcours not found");
         }
-      )}
-    })
-    .catch(next);
+
+        if (include?.includes("postes")) {
+          Resultat.aggregate(pipeline)
+            .exec()
+            .then(resultats => {
+              res.status(200).send(
+                {
+                  id: parcours._id,
+                  nom: parcours.nom,
+                  difficulte: parcours.difficulte,
+                  descr: parcours.descr,
+                  postesInclus: parcours.postesInclus,
+                  resultatsAct: resultats,
+                  nombrePages: Math.ceil(total / pageLimit)
+                }
+              )
+            })
+            .catch(next);
+        } else {
+          res.status(200).send(
+            {
+              id: parcours._id,
+              nom: parcours.nom,
+            }
+          )
+        }
+      })
+      .catch(next);
 
   })
 });
