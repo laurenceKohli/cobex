@@ -12,4 +12,4 @@ Cette application permettra de participer à des courses d'orientation fixes dan
 - validation des postes parcourus
 
 ## Version finale de l'api
-[https://cobex-uu6t.onrender.com]
+https://cobex-uu6t.onrender.com
