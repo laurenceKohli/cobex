@@ -766,31 +766,9 @@
           {
             "name": "parcours",
             "in": "query",
-            "description": "Filtrer par ID parcours",
+            "description": "Filtrer par ID parcours (uniquement s'il y a un utilisateur défini)",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Numéro de page (4 résultats par page)",
-            "schema": {
-              "type": "integer",
-              "minimum": 1
-            }
-          },
-          {
-            "name": "include",
-            "in": "query",
-            "description": "Inclure des informations supplémentaires",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "utilisateurs",
-                "parcours"
-              ],
-              "example": "parcours"
             }
           }
         ],
@@ -802,8 +780,8 @@
                 "examples": {
                   "withoutInclude": {
                     "summary": "Sans paramètres de requête",
-                    "value": {
-                      "data": [
+                    "value": 
+                      [
                         {
                           "id": "678504c0224b7e662ab9620a",
                           "temps": 120
@@ -816,28 +794,20 @@
                           "temps": 200
                       }
                       ]
-                    }
                   },
                   "withInclude": {
-                    "summary": "Avec paramètre `utilisateurs=678504c0224b7e662ab961e6&include=parcours`",
-                    "value": {
-                      "data": [
-                          {
-                              "id": "678504c0224b7e662ab9620a",
-                              "temps": 120,
-                              "parcours": {
-                                  "id": "678504c0224b7e662ab961ff",
-                                  "nom": "Parcours moyen"
-                              }
-                          },
-                          {
-                              "id": "678504c0224b7e662ab9620c",
-                              "temps": 200,
-                              "parcours": {
-                                  "id": "678504c0224b7e662ab961ff",
-                                  "nom": "Parcours moyen"
-                              }
-                          }]}
+                    "summary": "Avec paramètres `utilisateurs=678504c0224b7e662ab961e6&parcours=678504c0224b7e662ab961ff`",
+                    "value": 
+                    [
+                      {
+                          "id": "678504c0224b7e662ab9620c",
+                          "temps": 200,
+                          "parcours": {
+                              "id": "678504c0224b7e662ab961ff",
+                              "nom": "Parcours moyen"
+                          }
+                      }
+                  ]
                   }
                 }
               }
